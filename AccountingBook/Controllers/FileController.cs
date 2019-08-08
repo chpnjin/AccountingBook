@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Accounting.Controllers
+namespace AccountingBook.Controllers
 {
     [Route("api/[controller]")] //設定個別路由名稱
     public class FileController : Controller

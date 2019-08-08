@@ -1,4 +1,4 @@
-# accounting-client
+# accounting-book-client
 
 ## Project setup
 ```
