@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -48,15 +49,24 @@ namespace Accounting
                 app.UseHsts();
             }
 
+            //HTTP請求第一層Middleware
             app.Use(async (context, next) =>
             {
+                //將請求傳至下一層(因只有一層,呼叫next函式將使需求實際傳給Server)
                 await next();
 
-                // 判斷是否是要存取網頁，而不是發送 API 需求
+                //依照Server端回應狀態判斷是否更改URL
                 if (context.Response.StatusCode == 404 &&                       // 該資源不存在
-                    !System.IO.Path.HasExtension(context.Request.Path.Value) && // 網址最後沒有帶副檔名
-                    !context.Request.Path.Value.StartsWith("/api"))             // 網址不是 /api 開頭
+                    !System.IO.Path.HasExtension(context.Request.Path.Value) && // 網址最後沒有帶副檔名(非要求檔案)
+                    !context.Request.Path.Value.StartsWith("/api"))             // 網址不是 /api 開頭(非呼叫Web API)
                 {
+                    // URL轉址:將網址改成 /index.html
+                    //var options = new RewriteOptions();
+                    //options.AddRewrite(".", "/index.html", skipRemainingRules: true);
+                    //options.AddRedirect(".", "/index.html", 200);
+                    //app.UseRewriter(options);
+                    //context.Response.StatusCode = 200;
+
                     context.Request.Path = "/index.html";                       // 將網址改成 /index.html
                     context.Response.StatusCode = 200;                          // 並將 HTTP 狀態碼修改為 200 成功
                     await next();
