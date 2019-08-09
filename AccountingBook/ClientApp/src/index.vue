@@ -42,6 +42,13 @@
 </script>
 
 <style>
+* {
+  /* 實際寬高＝所設定的數值(已包含border和padding) */
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
 html, body {
     margin: 0px; /*去外距*/
     height: 100%; /*自動填滿瀏覽器高度*/

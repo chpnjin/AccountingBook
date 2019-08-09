@@ -5,7 +5,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR /src
-COPY ["AccountingBook/AccountingBook.csproj", "Accounting/"]
+COPY ["AccountingBook/AccountingBook.csproj", "AccountingBook/"]
 RUN dotnet restore "AccountingBook/AccountingBook.csproj"
 COPY . .
 WORKDIR "/src/AccountingBook"
