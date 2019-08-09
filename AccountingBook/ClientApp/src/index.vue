@@ -24,6 +24,7 @@
 </template>
 
 <script>
+    let selfData;
     module.exports = {
         data: function () {
             return {
