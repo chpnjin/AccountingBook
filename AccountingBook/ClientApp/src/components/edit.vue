@@ -2,16 +2,16 @@
   <div>
     <span>{{title}}</span>
     <hr />
-    <div id="flexBox">
-      <fieldset id="master">
+    <div class="flexBox">
+      <fieldset>
         <legend>主項目</legend>
         <table id="masterInfo" border="1">
           <colgroup>
             <col class="itemNameCol" />
-            <col id="masterInfo_col2" />
+            <col style=" width:480px" />
             <col class="itemNameCol" />
-            <col id="masterInfo_col4" />
-            <col id="masterInfo_col5" />
+            <col style="width:120px" />
+            <col style="width:70px" />
           </colgroup>
           <tr>
             <td>交易代碼</td>
@@ -44,6 +44,8 @@
         <table border="1" class="detialInfo">
           <colgroup>
             <col class="itemNameCol" />
+            <col />
+            <col style="width:70px"/>
           </colgroup>
           <tr>
             <td>
@@ -57,7 +59,7 @@
               <span>{{accountType}}</span>
             </td>
             <td rowspan="2">
-              <div class="detial_btn editButtons">
+              <div class="editButtons">
                 <button value>新增</button>
                 <button value>刪除</button>
               </div>
@@ -89,6 +91,8 @@
         <table border="1" class="detialInfo">
           <colgroup>
             <col class="itemNameCol" />
+            <col />
+            <col style="width:70px"/>
           </colgroup>
           <tr>
             <td>
@@ -142,24 +146,17 @@ module.exports = {
     };
   },
   created: function() {},
-  methods: {}
+  methods: {
+    addTxn: function() {},
+    updateTxn: function() {},
+    deleteTxn: function() {}
+  }
 };
 </script>
 
 <style>
-#flexBox {
-  display: flex;
-  /*flex-wrap:當超過瀏覽器寬度時flex元素自動換行*/
-  flex-wrap: wrap;
-}
-
 td > input {
   width: 100%;
-}
-
-#master {
-  display: flex;
-  flex: 100%;
 }
 
 /* 借方與貸方欄位 */
@@ -174,11 +171,7 @@ td > input {
   flex-basis: auto;
   width: 100%;
 }
-/* 交易明細操作按鈕 */
-.detial_btn {
-  flex-grow: 1;
-  flex-basis: auto;
-}
+
 /* 交易明細項目清單 */
 .detial_items_list {
   flex-grow: 1;
@@ -188,7 +181,7 @@ td > input {
 
 #masterInfo {
   /* flexItem基準為10px * 10倍 = 100px */
-  flex-grow: 9;
+  flex-grow: 1;
   flex-basis: 10px;
   table-layout: fixed;
   width: 100%;
@@ -198,21 +191,10 @@ td > input {
   width: 80px;
 }
 
-#masterInfo_col2 {
-  width: 480px;
-}
-
-#masterInfo_col4 {
-  width: 120px;
-}
-
-#masterInfo_col5 {
-  width: 70px;
-}
-
 #remark {
   width: 100%;
 }
+
 /* 交易主表操作 */
 #txnMasterActions {
   flex-grow: 1;
@@ -223,9 +205,5 @@ td > input {
 .editButtons {
   display: flex;
   flex-direction: column;
-}
-
-.editButtons button {
-  flex: 1;
 }
 </style>

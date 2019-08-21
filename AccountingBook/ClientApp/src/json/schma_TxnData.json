@@ -1,0 +1,23 @@
+{
+  "txnId":"TXN00001",
+  "txnDate": "2019-08-11",
+  "txnRemark": "測試",
+  "user": "loginUserID",
+  "content": [
+    {
+      "accountName": "",
+      "D/C": "D",
+      "amount": 50
+    },
+    {
+      "accountName": "",
+      "D/C": "D",
+      "amount": 50
+    },
+    {
+      "accountName": "",
+      "D/C": "C",
+      "amount": 100
+    }
+  ]
+}
