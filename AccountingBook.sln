@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountingBook", "AccountingBook\AccountingBook.csproj", "{26F4EA55-5C38-4916-B193-2CD179FB722C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountingBook", "WebSite\AccountingBook.csproj", "{82538FB7-FCCE-4F2B-B590-69118D92EC89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{26F4EA55-5C38-4916-B193-2CD179FB722C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{26F4EA55-5C38-4916-B193-2CD179FB722C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{26F4EA55-5C38-4916-B193-2CD179FB722C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{26F4EA55-5C38-4916-B193-2CD179FB722C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82538FB7-FCCE-4F2B-B590-69118D92EC89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82538FB7-FCCE-4F2B-B590-69118D92EC89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82538FB7-FCCE-4F2B-B590-69118D92EC89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82538FB7-FCCE-4F2B-B590-69118D92EC89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

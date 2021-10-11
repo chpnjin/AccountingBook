@@ -15,27 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="ClientApp\package-lock.json" />
-    <Content Include="ClientApp\package.json" />
-    <Content Include="ClientApp\public\favicon.ico" />
-    <Content Include="ClientApp\public\index.html" />
-    <Content Include="ClientApp\src\assets\logo.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="ClientApp\.gitignore" />
-    <None Include="ClientApp\babel.config.js" />
-    <None Include="ClientApp\README.md" />
-    <None Include="ClientApp\src\components\edit.vue" />
-    <None Include="ClientApp\src\components\query.vue" />
-    <None Include="ClientApp\src\components\settings.vue" />
-    <None Include="ClientApp\src\index.vue" />
-    <None Include="ClientApp\src\main.js" />
-    <None Include="ClientApp\vue.config.js" />
     <None Include="wwwroot\js\app.59512b1a.js" />
     <None Include="wwwroot\js\app.59512b1a.js.map" />
     <None Include="wwwroot\js\chunk-vendors.a6df83c5.js" />
