@@ -6,6 +6,6 @@
 
 第一階段預計將原Windows Form版的功能完全複製到此專案中
 
-<H4>ClientApp</H4>
-可用VS code等類IDE編輯的獨立前端Vue.js專案<br>
+<H4>client_app</H4>
+可用VS code等類IDE編輯的獨立前端Vue.js 3.0 專案<br>
 打包後發布目標為<span style="color:red;">AccountingBook\wwwroot<span>(取代預設dist資料夾)
