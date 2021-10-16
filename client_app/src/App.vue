@@ -4,21 +4,13 @@
     <div id="center">
       <nav>
         <ul>
-          <li>
-            <router-link to="/query">查詢交易紀錄</router-link>
-          </li>
-          <li>
-            <router-link to="/edit">編輯交易</router-link>
-          </li>
-          <li>
-            <router-link to="/settings">設定</router-link>
-          </li>
+          <li><router-link to="/query">查詢交易紀錄</router-link></li>
+          <li><router-link to="/edit">編輯交易</router-link></li>
+          <li><router-link to="/settings">設定</router-link></li>
         </ul>
       </nav>
       <content>
-        <router-view>
-          <!-- 模板填入內容 -->
-        </router-view>
+        <router-view/>
       </content>
     </div>
     <footer>{{copyright}}</footer>
