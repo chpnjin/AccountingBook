@@ -8,4 +8,4 @@
 
 <H4>ClientApp</H4>
 可用VS code等類IDE編輯的獨立前端Vue.js專案<br>
-打包後發布目標為<span style="color:red;">AccountingBook\wwwroot<span>
+打包後發布目標為<span style="color:red;">AccountingBook\wwwroot<span>(取代預設dist資料夾)
