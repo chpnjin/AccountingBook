@@ -1,9 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29123.88
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountingBook", "WebSite\AccountingBook.csproj", "{82538FB7-FCCE-4F2B-B590-69118D92EC89}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "web_site", "web_site\web_site.esproj", "{55087A62-5A4A-445A-BC9D-B41F90C0F404}"
+	ProjectSection(ProjectDependencies) = postProject
+		{38FF9F8F-9C92-4191-B872-A29DB891D93E} = {38FF9F8F-9C92-4191-B872-A29DB891D93E}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "api", "api\api.csproj", "{38FF9F8F-9C92-4191-B872-A29DB891D93E}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{EAC66B33-A3DB-4EC2-9E0F-15DAF5930BEF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "方案項目", "方案項目", "{24EAA0B8-A246-4551-9EB2-646927131349}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +23,25 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{82538FB7-FCCE-4F2B-B590-69118D92EC89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{82538FB7-FCCE-4F2B-B590-69118D92EC89}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{82538FB7-FCCE-4F2B-B590-69118D92EC89}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{82538FB7-FCCE-4F2B-B590-69118D92EC89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55087A62-5A4A-445A-BC9D-B41F90C0F404}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55087A62-5A4A-445A-BC9D-B41F90C0F404}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55087A62-5A4A-445A-BC9D-B41F90C0F404}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{55087A62-5A4A-445A-BC9D-B41F90C0F404}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55087A62-5A4A-445A-BC9D-B41F90C0F404}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55087A62-5A4A-445A-BC9D-B41F90C0F404}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{38FF9F8F-9C92-4191-B872-A29DB891D93E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38FF9F8F-9C92-4191-B872-A29DB891D93E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38FF9F8F-9C92-4191-B872-A29DB891D93E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38FF9F8F-9C92-4191-B872-A29DB891D93E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAC66B33-A3DB-4EC2-9E0F-15DAF5930BEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAC66B33-A3DB-4EC2-9E0F-15DAF5930BEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAC66B33-A3DB-4EC2-9E0F-15DAF5930BEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAC66B33-A3DB-4EC2-9E0F-15DAF5930BEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C744A989-8671-4DD6-A5DA-1C11C6C9D41D}
+		SolutionGuid = {3B932A0B-8D55-40C9-B541-55A2D5E6FF03}
 	EndGlobalSection
 EndGlobal
