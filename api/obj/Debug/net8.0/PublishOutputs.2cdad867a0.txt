@@ -1,0 +1,12 @@
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\api.exe
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\appsettings.Development.json
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\appsettings.json
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\api.dll
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\api.deps.json
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\api.runtimeconfig.json
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\api.pdb
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\Microsoft.AspNetCore.OpenApi.dll
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\Microsoft.OpenApi.dll
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\Solution\AccountingBook\api\obj\Debug\net8.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll
