@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import store from '../store'; // 使用 Vuex 管理狀態
-import Home from '@/views/Home.vue';
-import About from '@/views/About.vue';
+import Main from '@/layouts/MainLayout.vue';
 import Login from '@/views/LoginPage.vue';
 
 
@@ -9,14 +8,9 @@ import Login from '@/views/LoginPage.vue';
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'Main',
+    component: Main,
     meta: { requiresAuth: true } //需要驗證
-  },
-  {
-    path: '/about',
-    name: 'About',
-    component: About,
   },
   {
     path: '/login',
@@ -31,16 +25,38 @@ const router = createRouter({
 });
 
 //導航守衛-每次進入任何一個路由前，都會作呼叫。
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   // 從 Vuex 取得登入狀態
-  const id = store.getters("user_id");
+  const isAuthenticated = await verifyAuth();
 
   //若此路由需要驗證且無驗證資訊時,導向登入頁
-  if (to.matched.some(record => record.meta.requiresAuth) && id == "" || id == null) {
+  if (to.meta.requiresAuth && (!isAuthenticated)) {
     next('/login');
   } else {
     next();
   }
 });
+
+// 驗證函式（模擬異步操作）
+async function verifyAuth() {
+  try {
+    // 檢查 Vuex 是否有已登入的使用者 ID
+    const userId = store.getters['user_id'];
+
+    // 若有 ID，直接回傳 true
+    if (userId){
+      return true;
+    }else{
+      return false;
+    }
+
+    // // 若無 ID，可發送 API 請求確認登入狀態
+    // const response = await store.dispatch('fetchUserSession');
+    // return !!response.user_id; // 回傳是否有有效的 user_id
+  } catch (error) {
+    console.error('驗證失敗：', error);
+    return false; // 若發生錯誤，視為未驗證
+  }
+}
 
 export default router;

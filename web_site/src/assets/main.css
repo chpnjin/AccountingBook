@@ -22,13 +22,14 @@ a,
 }
 
 @media (min-width: 1024px) {
-  body {
+  /* 只針對主框架頁面（使用特定 class，例如 main-layout） */
+  .main-layout {
+    display: grid;
     display: flex;
     place-items: center;
   }
 
   #app {
-    display: grid;
     grid-template-columns: 1fr 1fr;
     padding: 0;
   }
