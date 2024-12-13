@@ -15,7 +15,7 @@ namespace api.Controllers
         [Route("API_test")]
         public async Task<ActionResult<string>> API_test()
         {
-            await Task.Delay(2000);
+            await Task.Delay(100);
             return "TEST OK";
         }
 
@@ -23,7 +23,7 @@ namespace api.Controllers
         [Route("GetData")]
         public async Task<ActionResult<User>> GetUser()
         {
-            await Task.Delay(2000);
+            await Task.Delay(100);
             return new User()
             {
                 Id = 10,
