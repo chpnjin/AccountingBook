@@ -1,66 +1,50 @@
 <template>
-  <div id="app">
+  <div class="main-layout">
     <header class="header">
       <div class="user-info">
         <span>登入者 : {{ username }}</span>
         <button @click="logout">登出</button>
       </div>
     </header>
-
     <div class="layout">
-      <nav class="sidebar">
-        <ul>
-          <li>
-            <a href="#" class="nav-item" @click.prevent="currentView = 'Home'">Home</a>
-          </li>
-          <li>
-            <a href="#" class="nav-item" @click.prevent="currentView = 'About'">About</a>
-          </li>
-        </ul>
-      </nav>
-      <!-- 實際內容 -->
-      <main class="content">
-        <component :is="currentView" />
-      </main>
+      <!-- 側邊欄 -->
+      <SidebarNav />
 
+      <!-- 內容區域 -->
+      <main class="content">
+        <router-view />
+      </main>
     </div>
   </div>
 </template>
 
 <script>
-import Home from '../views/Home.vue';
-import About from '../views/About.vue';
+import SidebarNav from '@/components/SidebarNav.vue';
+import { mapGetters } from 'vuex';
 
 export default {
-  data() {
-    return {
-      currentView: 'Home',
-    };
+  name: 'MainLayout',
+  components: {
+    SidebarNav,
   },
   computed: {
-    username(){
-      return this.$store.state.name; //從Vuex中取得name
-    }
-  },
-  components: {
-    Home,
-    About,
+    ...mapGetters(['name']),
+    username() {
+      return this.name;
+    },
   },
   methods: {
     logout() {
-      // 登出後清除 Vuex 中的 name 和其他登入狀態
-      this.$store.commit('setUserName', '');  // 清除名稱
-      this.$store.commit('setUserId', null);  // 清除使用者ID（如果有的話）
-
-      console.log("Logged out");
-      this.$router.push('/login');  // 可以選擇導向到登入頁
+      this.$store.commit('setUserName', '');
+      this.$store.commit('setUserId', null);
+      this.$router.push('/login');
     },
   },
 };
 </script>
 
 <style scoped>
-#app {
+.main-layout {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -71,13 +55,33 @@ export default {
 }
 
 .header {
+  display: flex; /* 使用 Flexbox 排版 */
   background: #2c3e50;
   color: #fff;
-  padding: 10px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  padding: 10px 20px; /* 增加內邊距 */
+  justify-content: flex-end; /* 將內容推到右邊 */
+  align-items:end; /* 垂直居中 */
   box-sizing: border-box;
+}
+
+.user-info {
+  display: flex;
+  align-items:end;
+  gap: 10px; /* 文字和按鈕之間的間距 */
+}
+
+.user-info span {
+  font-size: 14px; /* 調整字體大小 */
+}
+
+button {
+  background: #e74c3c;
+  border: none;
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px; /* 圓角按鈕 */
 }
 
 .layout {
@@ -97,13 +101,6 @@ export default {
   height: 100%;
 }
 
-.nav-item {
-  font-weight: bold;
-  margin: 5px 0;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
 .content {
   flex: 1;
   background: #ecf0f1;
@@ -111,17 +108,5 @@ export default {
   overflow-y: auto;
   padding: 10px;
   height: 100%;
-}
-
-button {
-  background: #e74c3c;
-  border: none;
-  color: #fff;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #c0392b;
 }
 </style>
