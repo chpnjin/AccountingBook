@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using MySqlConnector;
+using System.Data;
 
 try
 {
@@ -8,6 +9,18 @@ try
     builder.Services.AddEndpointsApiExplorer();
     //新增Swagger支援
     builder.Services.AddSwaggerGen();
+
+    // 添加對 SQL 連線的依賴注入
+    builder.Services.AddTransient<IDbConnection>((provider) =>
+    {
+        // 使用環境變數獲取連接字符串
+        var connectionString = Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING");
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("SQL_CONNECTION_STRING environment variable is not set.");
+        }
+        return new MySqlConnection(connectionString);
+    });
 
     var app = builder.Build();
 
