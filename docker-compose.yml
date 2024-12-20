@@ -4,15 +4,17 @@
         context: ./api  # NET8 API專案在 api 目錄下
         dockerfile: Dockerfile
     environment:
+      # - SQL_CONNECTION_STRING=Server=175.182.6.36,3306;Database=accounting;User=jim;Password=Syno[0912]logy;
+      - SQL_CONNECTION_STRING=Server=my-db;Database=accounting;User=jim;Password=doc[0912]Ker;
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      # - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_HTTPS_PORTS=8081
     ports:
       - "300:8080"
-      # - "301:8081"
-    # volumes:
-    #   - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-    #   - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - "301:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
   web_site:
       build:
         context: ./web_site  # Vue.js專案在 web_site 目錄下

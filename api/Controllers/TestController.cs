@@ -21,7 +21,7 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("GetFromDB")]
+        [Route("ConnectTest")]
         public async Task<ActionResult<string>> Get_From_DB()
         {
 
