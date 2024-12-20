@@ -1,11 +1,8 @@
 ﻿using api.Models;
+using api.Service;
 using Dapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using System.Data;
-using System.Data.SqlClient;
 
 namespace api.Controllers
 {
@@ -22,26 +19,49 @@ namespace api.Controllers
 
         [HttpPost]
         [Route("GetUser")]
-        public async Task<ActionResult<User>> GetUser(string email,string password)
+        public async Task<ActionResult<User>> GetUser(string id, string password)
         {
-            string sql = @"SELECT id, name, role_group 
-                             FROM user 
-                            WHERE email = @parm_email AND Password = @parm_password";
-
-            var user = await _connection.QuerySingleOrDefaultAsync<User>(sql, new
+            try
             {
-                //parm_email = input.GetValue("email"),
-                //parm_password = input.GetValue("password")
-                parm_email = email,
-                parm_password = password
-            });
+                string sql = @"SELECT id,name,role_group,status,
+                                 password_hash,
+                                 salt,
+                                 degree_of_parallelism,
+                                 iterations,
+                                 memory_size
+                               FROM user 
+                              WHERE name = @parm_name OR email = @parm_email";
 
-            if (user == null)
-            {
-                return Unauthorized("Invalid credentials");
+                var user = await _connection.QuerySingleOrDefaultAsync<User>(sql, new
+                {
+                    parm_name = id,
+                    parm_email = id,
+                });
+
+                if (user == null)
+                {
+                    return Unauthorized("User Not Found");
+                }
+
+                //密碼驗證
+                var isPasswordValid = await PasswordHasher.VerifyPassword(password,
+                user.password_hash,
+                user.salt,
+                user.degree_of_parallelism,
+                user.iterations,
+                user.memory_size);
+
+                if (!isPasswordValid)
+                {
+                    return Unauthorized("Invalid Password");
+                }
+
+                return Ok(user);
             }
-
-            return Ok(user);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

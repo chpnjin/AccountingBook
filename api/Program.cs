@@ -1,4 +1,5 @@
-﻿using MySqlConnector;
+﻿using api.Service;
+using MySqlConnector;
 using System.Data;
 
 try
@@ -21,6 +22,9 @@ try
         }
         return new MySqlConnection(connectionString);
     });
+
+    // 註冊你的初始化服務，這將在應用啟動時自動運行
+    builder.Services.AddHostedService<DatabaseInitService>();
 
     var app = builder.Build();
 

@@ -45,3 +45,4 @@
 /obj/Docker/docker-compose.vs.release.g.yml
 /obj/Docker/docker-compose.vs.release.partial.g.yml
 *.user
+*.dll
