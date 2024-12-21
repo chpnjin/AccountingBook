@@ -1,8 +1,13 @@
 ﻿using api.Models;
 using api.Service;
 using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.Data;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace api.Controllers
 {
@@ -17,9 +22,67 @@ namespace api.Controllers
             _connection = connection;
         }
 
-        [HttpPost]
-        [Route("GetUser")]
-        public async Task<ActionResult<User>> GetUser(string id, string password)
+        /// <summary>
+        /// 生成API訪問許可令牌
+        /// </summary>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static string GenerateToken(string UserName)
+        {
+            // 從環境變數中獲取配置
+            var configuration = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
+
+            var issuer = configuration["Jwt:Issuer"];
+            var audience = configuration["Jwt:Audience"];
+            var key = configuration["Jwt:Key"];
+
+            if (string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience) || string.IsNullOrEmpty(key))
+            {
+                throw new InvalidOperationException("JWT 基本設定未配置");
+            }
+
+            if (Encoding.UTF8.GetBytes(key).Length * 8 < 256)
+            {
+                throw new InvalidOperationException("JWT Key must be at least 256 bits long.");
+            }
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            //設置claims
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, UserName), // 用於示例，必須根據實際用戶信息設置
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            //生成Token
+            var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(30), // 令牌有效期設置為30分鐘，根據需要調整
+                signingCredentials: credentials
+            );
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var stringToken = tokenHandler.WriteToken(token);
+
+            return stringToken;
+        }
+
+        /// <summary>
+        /// 登入認證,取得Token令牌
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost("LoginVerification")]
+        public async Task<ActionResult<User>> LoginVerification(string id, string password)
         {
             try
             {
@@ -56,7 +119,10 @@ namespace api.Controllers
                     return Unauthorized("Invalid Password");
                 }
 
-                return Ok(user);
+                //生成Token
+                string token = GenerateToken(user.name);
+
+                return Ok(token);
             }
             catch (Exception ex)
             {

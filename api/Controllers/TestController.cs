@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -20,9 +21,38 @@ namespace api.Controllers
             _connection = connection;
         }
 
+        /// <summary>
+        /// 需認證API測試,若無JWT認證會回傳401 Error
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
         [HttpGet]
-        [Route("ConnectTest")]
-        public async Task<ActionResult<string>> Get_From_DB()
+        [Route("NeedAuthorizeTest")]
+        public async Task<ActionResult<string>> AuthorizeTest()
+        {
+
+            try
+            {
+                string sql = @"SELECT 'TEST OK'FROM user ";
+
+                _connection.Open();
+                var test = await _connection.QuerySingleOrDefaultAsync<string>(sql);
+
+                return "TEST OK";
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 不須認證對照組
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("NoNeedAuthorizeTest")]
+        public async Task<ActionResult<string>> NoNeedAuthorizeTest()
         {
 
             try

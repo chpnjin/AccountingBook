@@ -9,6 +9,9 @@
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
+      - Jwt__Key=your-very-very-secret-and-long-key-for-256-bits
+      - Jwt__Issuer=YourIssuer
+      - Jwt__Audience=YourAudience
     ports:
       - "300:8080"
       - "301:8081"
