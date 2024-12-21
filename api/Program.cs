@@ -15,7 +15,7 @@ try
 
     builder.Services.AddSwaggerGen(c =>
     {
-        // 加入JWT認證，使用從環境變數中獲取的值
+        // 加入JWT認證模擬，可輸入認證通過後取得的JWT
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             In = ParameterLocation.Header,
@@ -25,7 +25,7 @@ try
             BearerFormat = "JWT",
             Scheme = "Bearer"
         });
-
+        // 設定傳送Request時標頭自動加入Bearer + JWT
         c.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
             {
