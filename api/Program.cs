@@ -90,6 +90,12 @@ try
         app.UseSwaggerUI();
     }
 
+    app.UseCors(builder => builder
+    .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")     // Allow all ports on localhost
+    .AllowAnyMethod()                     // 允許任何方法
+    .AllowAnyHeader()                     // 允許任何標頭
+    .AllowCredentials());                 // 如果需要傳送 cookie 或認證信息
+
     app.UseRouting();
 
     // 添加用於認證和授權的中間件

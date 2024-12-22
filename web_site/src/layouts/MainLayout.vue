@@ -20,23 +20,20 @@
 
 <script>
 import SidebarNav from '@/components/SidebarNav.vue';
-import { mapGetters } from 'vuex';
 
 export default {
   name: 'MainLayout',
   components: {
     SidebarNav,
-  },
-  computed: {
-    ...mapGetters(['name']),
-    username() {
-      return this.name;
-    },
+  },data() {
+    return {
+      username: localStorage.getItem('user-name') || '未知用戶'
+    };
   },
   methods: {
     logout() {
-      this.$store.commit('setUserName', '');
-      this.$store.commit('setUserId', null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user-name');
       this.$router.push('/login');
     },
   },

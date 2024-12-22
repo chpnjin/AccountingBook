@@ -30,24 +30,50 @@ namespace api.Service
             //若不存在則自動新增
             if (!hasAdmin)
             {
-                string sql = @"
-                INSERT INTO user (name,email,role_group,password_hash,salt,degree_of_parallelism,iterations,memory_size) 
-                VALUES (@name, @email,@role_group, @password_hash,@salt,@degree_of_parallelism,@iterations,@memory_size)"
-                ;
-
-                var hashedPassword = await PasswordHasher.HashPassword("111111");
-
-                await connection.ExecuteAsync(sql, new
+                using (var transaction = await connection.BeginTransactionAsync())
                 {
-                    name = "admin",
-                    email = "admin@example.com",
-                    role_group = "admin",
-                    password_hash = hashedPassword.hash,
-                    salt = hashedPassword.salt,
-                    degree_of_parallelism = hashedPassword.degreeOfParallelism,
-                    iterations = hashedPassword.iterations,
-                    memory_size = hashedPassword.memorySize
-                });
+                    try
+                    {
+                        string userSql = @"
+                INSERT INTO user (name, email, role_group, password_hash, salt, degree_of_parallelism, iterations, memory_size) 
+                VALUES (@name, @email, @role_group, @password_hash, @salt, @degree_of_parallelism, @iterations, @memory_size);
+                SELECT CAST(LAST_INSERT_ID() AS INT);";
+
+                        var hashedPassword = await PasswordHasher.HashPassword("111111");
+
+                        // 插入到 user 表，並獲取自動生成的 ID
+                        var userId = await connection.ExecuteScalarAsync<int>(userSql, new
+                        {
+                            name = "admin",
+                            email = "admin@example.com",
+                            role_group = "admin",
+                            password_hash = hashedPassword.hash,
+                            salt = hashedPassword.salt,
+                            degree_of_parallelism = hashedPassword.degreeOfParallelism,
+                            iterations = hashedPassword.iterations,
+                            memory_size = hashedPassword.memorySize
+                        }, transaction);
+
+                        // 插入到 user_info 表
+                        string userInfoSql = @"
+                            INSERT INTO user_info (id, full_name) 
+                            VALUES (@userId, @full_name);";
+
+                        await connection.ExecuteAsync(userInfoSql, new
+                        {
+                            userId = userId,
+                            full_name = "系統管理員"
+                        }, transaction);
+
+                        //完成交易
+                        await transaction.CommitAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        throw;
+                    }
+                }
             }
         }
 

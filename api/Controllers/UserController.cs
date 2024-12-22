@@ -25,10 +25,10 @@ namespace api.Controllers
         /// <summary>
         /// 生成API訪問許可令牌
         /// </summary>
-        /// <param name="UserName"></param>
+        /// <param name="Id"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static string GenerateToken(string UserName)
+        public static string GenerateToken(int Id)
         {
             // 從環境變數中獲取配置
             var configuration = new ConfigurationBuilder()
@@ -55,7 +55,7 @@ namespace api.Controllers
             //設置claims
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, UserName), // 用於示例，必須根據實際用戶信息設置
+                new Claim(ClaimTypes.UserData,Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -82,23 +82,24 @@ namespace api.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("LoginVerification")]
-        public async Task<ActionResult<User>> LoginVerification(string id, string password)
+        public async Task<ActionResult> LoginVerification(LoginVerificationInput input)
         {
             try
             {
-                string sql = @"SELECT id,name,role_group,status,
+                string sql = @"SELECT t1.id,t2.full_name,status,
                                  password_hash,
                                  salt,
                                  degree_of_parallelism,
                                  iterations,
                                  memory_size
-                               FROM user 
+                               FROM user t1
+                              INNER JOIN user_info t2 ON t1.id = t2.id
                               WHERE name = @parm_name OR email = @parm_email";
 
-                var user = await _connection.QuerySingleOrDefaultAsync<User>(sql, new
+                var user = await _connection.QuerySingleOrDefaultAsync<UserVerification>(sql, new
                 {
-                    parm_name = id,
-                    parm_email = id,
+                    parm_name = input.id,
+                    parm_email = input.id,
                 });
 
                 if (user == null)
@@ -107,7 +108,7 @@ namespace api.Controllers
                 }
 
                 //密碼驗證
-                var isPasswordValid = await PasswordHasher.VerifyPassword(password,
+                var isPasswordValid = await PasswordHasher.VerifyPassword(input.password,
                 user.password_hash,
                 user.salt,
                 user.degree_of_parallelism,
@@ -120,9 +121,13 @@ namespace api.Controllers
                 }
 
                 //生成Token
-                string token = GenerateToken(user.name);
+                string token = GenerateToken(user.id);
 
-                return Ok(token);
+                return Ok(new
+                {
+                    token,
+                    user.full_name
+                });
             }
             catch (Exception ex)
             {

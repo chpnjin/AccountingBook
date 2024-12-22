@@ -50,6 +50,7 @@ namespace api.Controllers
         /// 不須認證對照組
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         [Route("NoNeedAuthorizeTest")]
         public async Task<ActionResult<string>> NoNeedAuthorizeTest()

@@ -2,16 +2,25 @@
 
 namespace api.Models
 {
-    public class User
+    /// <summary>
+    /// 傳入參數:登入驗證
+    /// </summary>
+    public class LoginVerificationInput
+    {
+        public string id { get; set; }
+        public string password { get; set; }
+    }
+
+    /// <summary>
+    /// 登入驗證回傳資料
+    /// </summary>
+    public class UserVerification
     {
         [Column("id")]
         public int id { get; set; }
 
         [Column("name")]
-        public string name { get; set; }
-
-        [Column("role_group")]
-        public string role_group { get; set; }
+        public string full_name { get; set; }
 
         [Column("status")]
         public string status { get; set; }

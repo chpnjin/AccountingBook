@@ -2,10 +2,14 @@
   <div class="login-page">
     <h1>塵世會計系統</h1>
     <form @submit.prevent="handleSubmit">
-      <input type="text" v-model="username" placeholder="帳號" />
+      <input type="text" v-model="id" placeholder="帳號" />
       <input type="password" v-model="password" placeholder="密碼" />
-      <button type="submit">登入</button>
+      <button @click="btnLogin_click" >登入</button>
     </form>
+    <p style="height: 20px ;"></p>
+    <!-- 新增測試按鈕 -->
+    <!-- <button @click="callApiTest">測試API</button> -->
+     <span id="msg">{{ message }}</span>
   </div>
 </template>
 
@@ -15,36 +19,48 @@
   export default {
     data() {
       return {
-        username: '',
-        password: ''
+        id: '',
+        password: '',
+        message:''
       };
     },
     methods: {
-      //捕捉按下button type="submit"之後的事件
-      async handleSubmit() {
+      async btnLogin_click(){
         try {
+          const loginParams = {
+            id: this.id,
+            password: this.password
+          };
+
           // 檢查是否有輸入用戶名和密碼
-          if (this.username.trim() === '' || this.password.trim() === '') {
-            alert('請輸入有效的帳號和密碼');
+          if (loginParams.id.trim() === '' || loginParams.password.trim() === '') {
+            this.message = '請輸入有效的帳號和密碼';
             return;
           }
 
-          const user = await UserService.getUser(this.username, this.password);
+          let result = await UserService.loginVerification(loginParams);
 
-          // 檢查回傳的用戶數據是否包含必要的字段
-          if (user && user.id && user.name) {
-            // 儲存使用者資訊至 Vuex
-            this.$store.commit('setUserId', user.id); // 設定 user_id
-            this.$store.commit('setUserName', user.name); // 設定 name
-
+          //檢查結果是否包含token
+          if (result.token) {
+            //儲存token備用
+            localStorage.setItem('token', result.token);
+            localStorage.setItem('user-name', result.name);
             // 導向主頁
             this.$router.push('/');
+
           } else {
-            alert('登錄失敗，請檢查您的帳號或密碼');
+            this.message = result.msg;
           }
         } catch (error) {
-          console.error('用戶登錄失敗:', error);
-          alert('登錄失敗，請稍後重試');
+          this.message = '登錄失敗，請稍後重試(' + error + ')';
+        }
+      },
+      async callApiTest() {
+        try {
+          let result = await UserService.callApiTest();
+          console.info(result);
+        } catch (error) {
+          console.error('API測試失敗:', error);
         }
       }
     }
@@ -91,4 +107,8 @@
     button:hover {
       background-color: #0056b3;
     }
+
+  msg{
+    color: aqua;
+  }
 </style>

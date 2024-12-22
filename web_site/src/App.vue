@@ -6,7 +6,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 import LoginPage from '@/views/LoginPage.vue';
 
 export default {
@@ -14,9 +13,8 @@ export default {
     LoginPage,
   },
   computed: {
-    ...mapGetters(['user_id']),
     isAuthenticated() {
-      return !!this.user_id; // 判斷是否已登入
+      return localStorage.getItem('token') !== null; // 檢查localStorage中是否存在token
     },
   },
 };
