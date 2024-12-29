@@ -1,4 +1,4 @@
-﻿import axios from '../services/axios';
+﻿import axios from '../services/_axios';
 
 export default {
   //API呼叫測試
@@ -14,7 +14,7 @@ export default {
     return result;
   },
 
-  //取得使用者
+  //使用者認證
   async loginVerification(parm) {
     let response = await axios.post('api/User/LoginVerification', parm).then((axios) => {
       return {
@@ -31,7 +31,7 @@ export default {
   //創建使用者
   async createUser(userData) {
     try {
-      const response = await axios.post('api/user/insert', userData);
+      const response = await axios.post('api/User/Insert', userData);
 
       return response.data;
     } catch (error) {

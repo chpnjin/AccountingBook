@@ -19,4 +19,4 @@ CREATE TABLE user_info (
     id INT PRIMARY KEY AUTO_INCREMENT COMMENT '主鍵，使用者唯一識別碼',
     full_name VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '使用者全名，可以是公司名或個人名',
     phone VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '聯絡電話'
-) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) DEFAULT CHARSET=uaccountstf8mb4 COLLATE=utf8mb4_unicode_ci;

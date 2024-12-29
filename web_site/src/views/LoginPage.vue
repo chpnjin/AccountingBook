@@ -92,6 +92,7 @@
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    background-color: #fff; /* 設定背景顏色為白色，與 Firefox 預設一致 */
   }
 
   button {
@@ -104,11 +105,11 @@
     cursor: pointer;
   }
 
-    button:hover {
-      background-color: #0056b3;
-    }
+  button:hover {
+    background-color: #0056b3;
+  }
 
-  msg{
+  msg {
     color: aqua;
   }
 </style>

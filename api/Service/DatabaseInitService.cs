@@ -61,7 +61,7 @@ namespace api.Service
 
                         await connection.ExecuteAsync(userInfoSql, new
                         {
-                            userId = userId,
+                            userId,
                             full_name = "系統管理員"
                         }, transaction);
 

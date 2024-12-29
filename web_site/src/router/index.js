@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import store from '../store'; // 使用 Vuex 管理狀態
+import Home from '@/views/_home.vue'
 import Main from '@/layouts/MainLayout.vue';
 import Login from '@/views/LoginPage.vue';
 import JE_Edit from '@/views/je-edit.vue';
@@ -17,7 +18,7 @@ const routes = [
     name: 'Main',
     component: Main,
     children:[
-      // { path: '', component: () => import('@/views/_home.vue') },
+      { path: '', name:'home',component:Home },
       { path: 'je-edit', name: 'je-edit', component: JE_Edit },
       { path: 'je-approval', name: 'je-approval', component: JE_Approval },
       { path: 'report-income-statement', name: 'report-income-statement', component: Report_IncomeStatement },

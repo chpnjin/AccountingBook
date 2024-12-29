@@ -1,4 +1,5 @@
-﻿using api.Service;
+﻿using api;
+using api.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -80,6 +81,8 @@ try
             };
         });
 
+    // 新增統一錯誤處裡
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
     var app = builder.Build();
 
