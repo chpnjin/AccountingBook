@@ -1,7 +1,10 @@
 <template>
   <h1>科目設定</h1>
   <p>主科目</p>
-  <button @click="openMainEditDialog">新增</button>
+  <div class="button-container">
+    <button @click="openMainEditDialog">新增</button>
+    <button>編輯</button>
+  </div>
   <!-- 主科目表 -->
   <div ref="table1"></div>
   <!-- 子科目表 -->
@@ -10,7 +13,9 @@
     <label for="select-mainAccount">對應主科目：</label>
     <span>{{ selectedMain.name }}</span>
     <br />
-    <button @click="openSubEditDialog">新增</button>
+    <div class="button-container">
+      <button @click="openSubEditDialog">新增</button>
+    </div>
     <div ref="table2" class="table-container"></div>
   </div>
 
@@ -109,7 +114,7 @@ onMounted(async () => {
     placeholder: () => {
       if (loading.value) {
         return "資料載入中..."; // 顯示載入中訊息
-      } else if (data_Main.value.length == 0) {
+      } else if (data_Sub.value.length == 0) {
         return "沒有資料"; // 顯示沒有資料訊息
       } else {
         return ""; // 有資料時不顯示任何訊息
@@ -189,8 +194,6 @@ const handleDialogClose = () => {};
 <style scoped>
 .table-container {
   border: 1px solid #ccc;
-  padding: 10px;
-  margin-top: 10px;
 }
 
 .subsection {
@@ -207,5 +210,28 @@ const handleDialogClose = () => {};
   /* background-color: white; 讓標題底色與背景相同，遮蓋外框線 */
   padding: 0 5px; /* 增加左右內距，使文字周圍有空間 */
   font-weight: bold;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px; /*按鈕間距*/
+  padding: 2px 2px 10px 2px; /* 容器內距 */
+}
+
+.button-container button {
+  padding: 5px 20px;
+  border: none; /* 移除預設邊框 */
+  border-radius: 5px;
+  background-color: #4CAF50; /* 設定背景顏色 */
+  color: white; /* 設定文字顏色 */
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.3s ease; /* 加入過渡效果 */
+}
+
+.button-container button:hover {
+  background-color: #45a049; /* 滑鼠懸停時改變背景顏色 */
 }
 </style>

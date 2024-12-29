@@ -21,6 +21,7 @@ export default {
         "token": axios.data.token,
         "name" : axios.data.full_name
       };
+      
     }).catch((error) => {
       return { "msg": error.response.data };
     });

@@ -41,8 +41,6 @@ namespace api.Controllers
                 var data = await _connection.QueryAsync<dynamic>(sql);
                 var json = JsonConvert.SerializeObject(data, Formatting.Indented);
 
-                await Task.Delay(1000);
-
                 return Ok(json);
             }
             catch (Exception ex)
@@ -69,8 +67,6 @@ namespace api.Controllers
 
                 var data = await _connection.QueryAsync<dynamic>(sql, new { @main_id = parms.main_id });
                 var json = JsonConvert.SerializeObject(data, Formatting.Indented);
-
-                await Task.Delay(1000);
 
                 return Ok(json);
             }
