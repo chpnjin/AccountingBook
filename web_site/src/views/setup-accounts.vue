@@ -2,8 +2,11 @@
   <h1>科目設定</h1>
   <p>主科目</p>
   <div class="button-container">
-    <button @click="openMainEditDialog">新增</button>
-    <button>編輯</button>
+    <button id="main-add" @click="openDialog">新增</button>
+    <button id="main-update" @click="openDialog" :disabled="btnDisableMain">
+      編輯
+    </button>
+    <button @click="inActiveMain" :disabled="btnDisableMain">停用</button>
   </div>
   <!-- 主科目表 -->
   <div ref="table1"></div>
@@ -14,23 +17,30 @@
     <span>{{ selectedMain.name }}</span>
     <br />
     <div class="button-container">
-      <button @click="openSubEditDialog">新增</button>
+      <button id="sub-add" @click="openDialog" :disabled="btnDisableMain">
+        新增
+      </button>
+      <button id="sub-update" @click="openDialog" :disabled="btnDisableSub">
+        編輯
+      </button>
+      <button @click="inActiveSub" :disabled="btnDisableSub">停用</button>
     </div>
     <div ref="table2" class="table-container"></div>
   </div>
 
   <!-- 主科目編輯彈窗 -->
   <editDialog
-    title="新增主科目"
-    v-model:visible="mainEditDialogVisible"
-    :editTargetId="selectedMain.id"
+    :title="dialogTitle"
+    :visible="mainDialogVisible"
+    :input-data="selectedMain"
     @save="handleSaveMainAccount"
     @close="handleDialogClose"
   ></editDialog>
   <!-- 子科目編輯彈窗 v-model 綁定屬性-->
   <editSubDialog
-    title="新增子科目"
-    v-model:visible="subEditDialogVisible"
+    :title="dialogTitle"
+    :visible="subDialogVisible"
+    :type-name="typeName"
     :parent-account="selectedMain"
     :editing-account="selectedSub"
     @save="handleSaveSub"
@@ -46,8 +56,10 @@ import accountService from "@/services/accountService"; //API呼叫服務
 import "tabulator-tables/dist/css/tabulator_simple.min.css"; // 引入 simple 主題
 import editDialog from "@/components/Dialog_Account.vue"; //引用彈出視窗組件
 import editSubDialog from "@/components/Dialog_SubAccount.vue"; //引用彈出視窗組件
+import accountTypes from "@/config/type-list.js";
 
 //引用物件
+const dialogTitle = ref(""); //彈窗標題
 const table1 = ref(null);
 const table2 = ref(null);
 const obj_TMain = ref(Tabulator); //主科目物件
@@ -57,10 +69,13 @@ const data_Sub = ref([]); //子科目資料
 const loading = ref(false);
 const selectedMain = ref([]); //被選中的主科目
 const selectedSub = ref([]); //被選中的子科目
+const btnDisableMain = ref(true); //
+const btnDisableSub = ref(true);
+const typeName = ref("");
 
 //控制編輯彈窗隱藏
-const mainEditDialogVisible = ref(false);
-const subEditDialogVisible = ref(false);
+const mainDialogVisible = ref(false);
+const subDialogVisible = ref(false);
 
 onMounted(async () => {
   //主科目表
@@ -72,7 +87,16 @@ onMounted(async () => {
       { title: "ID", field: "id", visible: false, sorter: "number" },
       { title: "科目編號", field: "no", width: 100 },
       { title: "科目名稱", field: "name", width: 150 },
-      { title: "科目類型", field: "type", width: 80 },
+      {
+        title: "科目類型",
+        field: "type",
+        width: 80,
+        formatter: (cell) => {
+          const value = cell.getValue();
+          const foundType = accountTypes.find((x) => x.value === value);
+          return foundType ? foundType.title : "未找到"; // 如果找不到則回傳 "未找到"
+        },
+      },
       { title: "描述", field: "description", widthGrow: 1 }, // 描述欄位填滿剩餘寬度
       {
         title: "啟用?",
@@ -123,12 +147,31 @@ onMounted(async () => {
   });
 
   //事件:主科目列選取
-  obj_TMain.value.on("rowClick", function (e, row) {
+  obj_TMain.value.on("rowClick", (e, row) => {
     let rowData = row.getData();
-    // console.info(rowData.id + ":" + rowData.name);
+
     //選中時紀錄選住得主科目資料
     selectedMain.value = row.isSelected() ? rowData : [];
-    reloadSub(selectedMain.value.id);
+    //被選中時允許編輯
+    btnDisableMain.value = !row.isSelected();
+
+    if (row.isSelected()) {
+      btnDisableSub.value = true;
+      //科目類型中文名稱
+      typeName.value = accountTypes.find(
+        (x) => x.value === selectedMain.value.type
+      ).title;
+      //重讀子科目
+      reloadSub(selectedMain.value.id);
+    }
+  });
+
+  //事件:子科目列選取
+  obj_TSub.value.on("rowClick", (e, row) => {
+    let rowData = row.getData();
+
+    selectedSub.value = row.isSelected() ? rowData : [];
+    btnDisableSub.value = !row.isSelected();
   });
 
   // 使用 nextTick 確保 DOM 更新完成後再載入資料
@@ -138,11 +181,36 @@ onMounted(async () => {
 });
 
 //事件:開啟編輯彈窗
-const openMainEditDialog = () => {
-  mainEditDialogVisible.value = true;
-};
-const openSubEditDialog = () => {
-  subEditDialogVisible.value = true;
+const openDialog = (e) => {
+  let dialog = e.target.id;
+
+  switch (dialog) {
+    case "main-add":
+      dialogTitle.value = "新增主科目";
+      // obj_TMain.value.deselectRow();
+      selectedMain.value = [];
+      mainDialogVisible.value = true;
+      break;
+    case "main-update":
+      dialogTitle.value = "編輯主科目";
+      selectedMain.value = obj_TMain.value
+        .getSelectedRows()
+        .map((row) => row.getData())[0];
+      mainDialogVisible.value = true;
+      break;
+    case "sub-add":
+      dialogTitle.value = "新增子科目";
+      selectedSub.value = {};
+      subDialogVisible.value = true;
+      break;
+    case "sub-update":
+      dialogTitle.value = "編輯子科目";
+      selectedSub.value = obj_TSub.value
+        .getSelectedRows()
+        .map((row) => row.getData())[0];
+      subDialogVisible.value = true;
+      break;
+  }
 };
 
 //重抓主科目表
@@ -172,23 +240,38 @@ const reloadSub = async (mainId) => {
     loading.value = false; // 設定載入狀態為 false
     obj_TSub.value.setPlaceholder("載入資料發生錯誤");
   }
-}
+};
 
 //子組件事件:儲存主科目
 const handleSaveMainAccount = (model) => {
-  console.log(model);
-  accountService.addMainAccount(model);
-  reloadMain();
+  accountService.editMainAccount(model).then(() => {
+    reloadMain();
+  });
 };
 //子組件事件:儲存子科目
 const handleSaveSub = (model) => {
-  console.log(model);
-  accountService.addSubAccount(model);
-  reloadSub(selectedMain.value.id);
+  accountService.editSubAccount(model).then(() => {
+    reloadSub(selectedMain.value.id);
+  });
 };
 
 //子組件事件:關閉視窗
-const handleDialogClose = () => {};
+const handleDialogClose = () => {
+  let selectedRows = obj_TMain.value.getSelectedRows();
+  if (selectedRows.length > 0) {
+    selectedMain.value = selectedRows[0].getData();
+    console.log(selectedMain.value);
+  }
+
+  selectedRows = obj_TSub.value.getSelectedRows();
+  if (selectedRows.length > 0) {
+    selectedSub.value = selectedRows[0].getData();
+    console.log(selectedSub.value);
+  }
+
+  mainDialogVisible.value = false;
+  subDialogVisible.value = false;
+};
 </script>
 
 <style scoped>
@@ -224,7 +307,7 @@ const handleDialogClose = () => {};
   padding: 5px 20px;
   border: none; /* 移除預設邊框 */
   border-radius: 5px;
-  background-color: #4CAF50; /* 設定背景顏色 */
+  background-color: #4caf50; /* 設定背景顏色 */
   color: white; /* 設定文字顏色 */
   cursor: pointer;
   font-size: 15px;
@@ -233,5 +316,17 @@ const handleDialogClose = () => {};
 
 .button-container button:hover {
   background-color: #45a049; /* 滑鼠懸停時改變背景顏色 */
+}
+
+.button-container button:hover:not(:disabled) {
+  /* 只有在未 disabled 時才套用 hover 效果 */
+  background-color: #45a049;
+}
+
+.button-container button:disabled {
+  background-color: #cccccc; /* disabled 時的背景顏色 (灰色) */
+  color: #666666; /* disabled 時的文字顏色 (深灰色) */
+  cursor: default; /* disabled 時的滑鼠游標 */
+  opacity: 0.6; /* 降低透明度，更明顯區分 */
 }
 </style>

@@ -2,37 +2,30 @@
   <div v-if="visible" class="dialog-overlay">
     <div class="dialog">
       <div class="dialog-header">
-        <h2>{{ dialogTitle }}</h2>
+        <h2>{{ title }}</h2>
         <!-- 右上關閉按鈕 -->
         <button @click="closeDialog" class="close-button">&times;</button>
       </div>
       <div class="dialog-body">
+        <input type="hidden" v-model="account.id" />
         <div class="form-group">
           <label>父科目名稱：</label>
           <span>{{ parentAccount?.name }}</span>
         </div>
         <div class="form-group">
           <label>父科目類型：</label>
-          <span>{{ parentAccount?.type }}</span>
+          <span>{{ typeName }}</span>
         </div>
         <div class="form-group" :class="{ 'has-error': noError }">
           <label for="subAccountNo">子科目編號：</label>
-          <input
-            type="text"
-            id="subAccountNo"
-            v-model="localEditingAccount.no"
-          />
+          <input type="text" id="subAccountNo" v-model="account.no" />
           <div v-if="noError" class="error-message">
             {{ noErrorMessage }}
           </div>
         </div>
         <div class="form-group" :class="{ 'has-error': nameError }">
           <label for="subAccountName">子科目名稱：</label>
-          <input
-            type="text"
-            id="subAccountName"
-            v-model="localEditingAccount.name"
-          />
+          <input type="text" id="subAccountName" v-model="account.name" />
           <div v-if="nameError" class="error-message">
             {{ nameErrorMessage }}
           </div>
@@ -41,7 +34,7 @@
           <label for="subAccountDescription">描述：</label>
           <textarea
             id="subAccountDescription"
-            v-model="localEditingAccount.description"
+            v-model="account.description"
           ></textarea>
           <div v-if="descriptionError" class="error-message">
             {{ descriptionErrorMessage }}
@@ -57,14 +50,31 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, watch, onMounted } from "vue";
+import {
+  ref,
+  reactive,
+  watch,
+  defineProps,
+  defineEmits,
+  onMounted,
+  toRaw,
+} from "vue";
 
 //定義可在父組件設定屬性
 const props = defineProps({
+  title: {
+    type: String,
+    default: "新增子科目",
+  },
   //視窗是否可見
   visible: {
     type: Boolean,
     default: false,
+  },
+  //科目種類中文
+  typeName: {
+    type: String,
+    default: "",
   },
   parentAccount: Object, //傳入的主科目資料
   editingAccount: Object, //用於編輯既有科目
@@ -72,9 +82,7 @@ const props = defineProps({
 
 //定義事件
 const emit = defineEmits(["save", "close", "update:visible"]);
-
-const dialogTitle = ref("新增子科目");
-
+//欄位驗證用
 const noError = ref(false);
 const nameError = ref(false);
 const descriptionError = ref(false);
@@ -82,55 +90,88 @@ const noErrorMessage = ref("");
 const nameErrorMessage = ref("");
 const descriptionErrorMessage = ref("");
 
-const localEditingAccount = ref({}); //紀錄子科目輸入值
+const account = reactive({
+  id: null,
+  no: "",
+  name: "",
+  description: "",
+}); //紀錄子科目輸入值
 
-watch(
-  //同步更新編輯中的科目資料
-  () => props.editingAccount,
-  (newValue) => {
-    if (newValue) {
-      resetForm();
-      localEditingAccount.value = { ...newValue };
-    }
-  }
-);
+const resetAccount = () => {
+  // 使用 Object.assign 更新 account 物件，避免整個物件被替換
+  Object.assign(account, {
+    id: null,
+    no: "",
+    name: "",
+    description: "",
+  });
+  resetErrorMessages();
+};
 
-//初始化資料,帶入初始值
-onMounted(async () => {
-  if (Object.keys(localEditingAccount.value).length === 0 ) {
-    localEditingAccount.value.id = 0;
-    localEditingAccount.value.no = "";
-    localEditingAccount.value.name = "";
-    localEditingAccount.value.description = "";
-  }
-});
-
-//清除未驗證資訊
-const resetForm = () => {
-  //重置表單
-  localEditingAccount.value.no = "";
-  localEditingAccount.value.name = "";
-  localEditingAccount.value.description = "";
-
-  //重置錯誤訊息
+// 重置錯誤訊息
+const resetErrorMessages = () => {
   noError.value = false;
   nameError.value = false;
   descriptionError.value = false;
+  noErrorMessage.value = "";
   nameErrorMessage.value = "";
   descriptionErrorMessage.value = "";
 };
 
+onMounted(async () => {
+  resetAccount(props.editingAccount);
+});
+
+//利用監聽機制設定預設值
+watch(
+  () => props.editingAccount,
+  (newValue) => {
+    if (Object.keys(newValue).length == 0) {
+      resetAccount();
+    } else {
+      Object.assign(account, newValue);
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => account.no,
+  () => {
+    noError.value = false;
+    noErrorMessage.value = "";
+  }
+);
+
+watch(
+  () => account.name,
+  () => {
+    nameError.value = false;
+    nameErrorMessage.value = "";
+  }
+);
+
+watch(
+  () => account.description,
+  () => {
+    descriptionError.value = false;
+    descriptionErrorMessage.value = "";
+  }
+);
+
 //關閉彈窗
 const closeDialog = () => {
-  emit("update:visible", false); //視窗visible屬性
+  //取消編輯時回填原始資料
+  if (account.id != null) {
+    Object.assign(account, props.editingAccount);
+  }
   emit("close"); // 觸發對話框關閉事件
-  resetForm(); // 關閉時重置表單和錯誤訊息
 };
 
 const saveAccount = () => {
-  noError.value = !localEditingAccount.value.no.trim();
-  nameError.value = !localEditingAccount.value.name.trim();
-  descriptionError.value = !localEditingAccount.value.description.trim();
+  noError.value = !account.no.trim();
+  nameError.value = !account.name.trim();
+  descriptionError.value = !account.description.trim();
 
   noErrorMessage.value = noError.value ? "子科目編號不得為空" : "";
   nameErrorMessage.value = nameError.value ? "子科目名稱不得為空" : "";
@@ -140,12 +181,11 @@ const saveAccount = () => {
     return;
   }
 
-  //回填主科目id與類型
-  localEditingAccount.value.main_id = props.parentAccount.id;
-  localEditingAccount.value.type = props.parentAccount.type;
-  const jsonObj = JSON.parse(JSON.stringify(localEditingAccount.value));
+  account.main_id = props.parentAccount.id;
+  account.type = props.parentAccount.type;
 
-  emit("save", jsonObj); //觸發save事件
+  console.info(account);
+  emit("save", toRaw(account)); //觸發save事件
   closeDialog();
 };
 </script>
@@ -178,12 +218,6 @@ const saveAccount = () => {
   align-items: center;
   border-bottom: 1px solid #eee;
   margin-bottom: 10px;
-}
-
-.close-button {
-  font-size: 20px;
-  cursor: pointer;
-  border: none;
 }
 
 .form-group {
@@ -222,6 +256,12 @@ button {
 
 button:hover {
   background-color: #38a372;
+}
+
+.close-button {
+  font-size: 20px;
+  cursor: pointer;
+  border: none;
 }
 
 .button-container {

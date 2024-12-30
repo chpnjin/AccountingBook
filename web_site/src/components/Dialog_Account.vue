@@ -2,32 +2,30 @@
   <div v-if="visible" class="dialog-overlay">
     <div class="dialog">
       <div class="dialog-header">
-        <slot name="header">
-          {{ title }}
-        </slot>
+        <h2>{{ title }}</h2>
         <!-- click動作綁定Method : closeDialog -->
         <button @click="closeDialog" class="close-button">&times;</button>
       </div>
       <div class="dialog-body">
         <!--  -->
-        <input type="hidden" v-bind="editTargetId" />
+        <input type="hidden" v-model="account.id" />
         <div class="form-group" :class="{ 'has-error': noError }">
-          <label for="input-text">科目編號</label>
-          <input type="text" id="input-text" v-model="accountNo" />
+          <label>科目編號</label>
+          <input type="text" v-model="account.no" />
           <div v-if="noError" class="error-message">
             {{ noErrorMessage }}
           </div>
         </div>
         <div class="form-group" :class="{ 'has-error': nameError }">
-          <label for="input-text">科目名稱</label>
-          <input type="text" id="input-text" v-model="accountName" />
+          <label>科目名稱</label>
+          <input type="text" v-model="account.name" />
           <div v-if="nameError" class="error-message">
             {{ nameErrorMessage }}
           </div>
         </div>
-        <div class="form-group" :class="{ 'has-error': typeError }">
+        <div class="form-group">
           <label for="select-option">科目類別：</label>
-          <select id="select-option" v-model="accountType">
+          <select id="select-option" v-model="account.type">
             <option
               v-for="option in typeList"
               :key="option.value"
@@ -36,31 +34,33 @@
               {{ option.title }}
             </option>
           </select>
-          <div v-if="typeError" class="error-message">
-            {{ typeErrorMessage }}
-          </div>
         </div>
         <div class="form-group" :class="{ 'has-error': descriptionError }">
           <label for="description">科目描述：</label>
-          <textarea id="description" v-model="accountDescription"></textarea>
+          <textarea id="description" v-model="account.description"></textarea>
           <div v-if="descriptionError" class="error-message">
             {{ descriptionErrorMessage }}
           </div>
         </div>
-        <slot name="body"></slot>
       </div>
-      <div class="dialog-footer">
-        <slot name="footer">
-          <button @click="closeDialog">取消</button>
-          <button @click="saveAccount">確定</button>
-        </slot>
+      <div class="button-container">
+        <button @click="closeDialog">取消</button>
+        <button @click="saveAccount">確認</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, watch } from "vue";
+import {
+  ref,
+  reactive,
+  watch,
+  defineProps,
+  defineEmits,
+  onMounted,
+  toRaw,
+} from "vue";
 /*
 ref:         用來創建一個響應式引用資料型態
 watch:       用來監聽響應式數據的變化，並在變化發生時執行相應的副作用函數
@@ -68,7 +68,7 @@ defineProps: 用於定義從父組件傳入子組件的屬性
 defineEmits: 用來定義組件可以發射的事件，這些事件可以被父組件監聽和處理
 */
 
-//定義屬性,可以在父組件叫用(v-model:)
+//定義屬性,可以在父組件叫用('v-model:'或':')
 const props = defineProps({
   title: {
     type: String,
@@ -79,20 +79,37 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  //用於編輯既有科目
-  editTargetId: {
-    type: Number,
-    default: 0,
+  //用於編輯既有科目(在父組件改名input-data)
+  inputData: {
+    type: Object,
+    default: () => ({
+      id: "",
+      no: 0,
+      name: "",
+      type: "Asset",
+      description: "",
+    }),
   },
 });
 
 //定義事件
-const emit = defineEmits(["save", "close", "update:visible"]);
+const emit = defineEmits(["save", "close"]);
 
-// 本地狀態
-const accountNo = ref(""); //科目編號
-const accountName = ref(""); //科目名稱
-const accountType = ref(""); // 科目類型(預設資產)
+const account = reactive({
+  id: null,
+  no: "",
+  name: "",
+  type: "Asset",
+  description: "",
+});
+
+//欄位驗證用
+const noError = ref(false);
+const nameError = ref(false);
+const descriptionError = ref(false);
+const noErrorMessage = ref("");
+const nameErrorMessage = ref("");
+const descriptionErrorMessage = ref("");
 
 const typeList = ref([
   { title: "資產", value: "Asset" },
@@ -102,102 +119,98 @@ const typeList = ref([
   { title: "費用", value: "Expense" },
 ]);
 
-const accountDescription = ref(""); //科目描述
+const resetAccount = () => {
+  // 使用 Object.assign 更新 account 物件，避免整個物件被替換
+  Object.assign(account, {
+    id: null,
+    no: "",
+    name: "",
+    type: "Asset",
+    description: "",
+  });
+  resetErrorMessages();
+};
 
-const noError = ref(false);
-const nameError = ref(false);
-const typeError = ref(false);
-const descriptionError = ref(false);
-const noErrorMessage = ref("");
-const nameErrorMessage = ref("");
-const typeErrorMessage = ref("");
-const descriptionErrorMessage = ref("");
-
-// 監聽 visible prop 的變化，當 Dialog 開啟時設定初始值
-watch(
-  () => props.visible,
-  (newValue) => {
-    if (newValue) {
-      resetForm();
-    }
-  }
-);
-
-// 監聽 accountNo 的變化
-watch(accountNo, () => {
-  noError.value = false; // 清除 nameError
-  noError.value = "";
-});
-
-// 監聽 accountName 的變化
-watch(accountName, () => {
-  nameError.value = false; // 清除 nameError
-  nameErrorMessage.value = "";
-});
-
-// 監聽 accountType 的變化
-watch(accountType, () => {
-  typeError.value = false; // 清除 typeError
-  typeErrorMessage.value = "";
-});
-
-// 監聽 accountDescription 的變化
-watch(accountDescription, () => {
-  descriptionError.value = false; // 清除 descriptionError
-  descriptionErrorMessage.value = "";
-});
-
-//清除未驗證資訊
-const resetForm = () => {
-  //重置表單
-  accountNo.value = "";
-  accountName.value = "";
-  accountType.value = "";
-  accountDescription.value = "";
-
-  //重置錯誤訊息
+// 重置錯誤訊息
+const resetErrorMessages = () => {
   noError.value = false;
   nameError.value = false;
-  typeError.value = false;
   descriptionError.value = false;
+  noErrorMessage.value = "";
   nameErrorMessage.value = "";
-  typeErrorMessage.value = "";
   descriptionErrorMessage.value = "";
 };
 
+// 使用 onMounted 確保組件掛載後再處理 props.inputData
+onMounted(() => {
+  resetAccount(props.inputData);
+});
+
+//每次開窗時檢查是否有傳入資料
+watch(
+  () => props.inputData,
+  (newValue) => {
+    if (Object.keys(newValue).length == 0) {
+      resetAccount();
+    } else {
+      Object.assign(account, newValue);
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => account.no,
+  () => {
+    noError.value = false;
+    noErrorMessage.value = "";
+  },
+  { deep: true }
+);
+
+watch(
+  () => account.name,
+  () => {
+    nameError.value = false;
+    nameErrorMessage.value = "";
+  }
+);
+
+watch(
+  () => account.description,
+  () => {
+    descriptionError.value = false;
+    descriptionErrorMessage.value = "";
+  }
+);
+
 // 關閉對話框
 const closeDialog = () => {
-  emit("update:visible", false); //視窗visible屬性
+  //取消編輯時回填原始資料
+  if (account.id != null) {
+    Object.assign(account, props.inputData);
+  }
   emit("close"); // 觸發對話框關閉事件
-  resetForm(); // 關閉時重置表單和錯誤訊息
 };
 
 // 保存科目
 const saveAccount = () => {
-  noError.value = !accountNo.value.trim();
-  nameError.value = !accountName.value.trim();
-  typeError.value = !accountType.value;
-  descriptionError.value = !accountDescription.value.trim();
+  noError.value = !account.no.trim();
+  nameError.value = !account.name.trim();
+  descriptionError.value = !account.description.trim();
 
   noErrorMessage.value = noError.value ? "科目編號不得為空" : "";
   nameErrorMessage.value = nameError.value ? "科目名稱不得為空" : "";
-  typeErrorMessage.value = typeError.value ? "請選擇科目類別" : "";
   descriptionErrorMessage.value = descriptionError.value
     ? "科目描述不得為空"
     : "";
 
-  if (noError.value || nameError.value || typeError.value || descriptionError.value) {
+  if (noError.value || nameError.value || descriptionError.value) {
     return;
   }
 
   //觸發事件:save
-  emit("save", {
-    id: props.editTargetId,
-    no:accountNo.value,
-    name: accountName.value,
-    type: accountType.value,
-    description: accountDescription.value,
-  });
+  emit("save", toRaw(account));
   closeDialog();
 };
 </script>
@@ -236,7 +249,6 @@ const saveAccount = () => {
 
 .close-button {
   font-size: 20px;
-  background: none;
   cursor: pointer;
   border: none;
 }
@@ -266,15 +278,38 @@ textarea {
   box-sizing: border-box;
 }
 
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
+button {
   margin-top: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #42b983; /* Vue 的綠色 */
+  color: white;
 }
 
-.dialog-footer button {
-  margin-left: 5px;
-  padding: 5px 10px;
+button:hover {
+  background-color: #38a372;
+}
+
+.close-button {
+  font-size: 20px;
+  cursor: pointer;
+  border: none;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* 靠右對齊 */
+  margin-top: 10px; /* 增加按鈕區塊與上方表單的間距 */
+}
+
+.button-container button {
+  margin-left: 10px; /* 按鈕間隔 */
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 /* 錯誤訊息樣式 */

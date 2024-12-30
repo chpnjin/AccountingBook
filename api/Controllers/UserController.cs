@@ -28,7 +28,7 @@ namespace api.Controllers
         /// <param name="Id"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static string GenerateToken(int Id)
+        public static string GenerateToken(int Id,bool isAdmin)
         {
             // 從環境變數中獲取配置
             var configuration = new ConfigurationBuilder()
@@ -59,12 +59,22 @@ namespace api.Controllers
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
+            DateTime expires;
+            if (isAdmin)
+            {
+                expires = DateTime.UtcNow.AddYears(99); //管理員令牌無時限
+            }
+            else
+            {
+                expires = DateTime.UtcNow.AddMinutes(30); //令牌有效期設置為30分鐘
+            }
+
             //生成Token
             var token = new JwtSecurityToken(
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(30), // 令牌有效期設置為30分鐘，根據需要調整
+                expires: expires,
                 signingCredentials: credentials
             );
 
@@ -120,8 +130,9 @@ namespace api.Controllers
                     return Unauthorized("Invalid Password");
                 }
 
+                bool isAdmin = user.full_name == "系統管理員" ? true : false;
                 //生成Token
-                string token = GenerateToken(user.id);
+                string token = GenerateToken(user.id, isAdmin);
 
                 return Ok(new
                 {

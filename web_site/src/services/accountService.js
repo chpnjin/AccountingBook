@@ -28,8 +28,8 @@ export default {
       return [];
     }
   },
-  //新增主科目
-  async addMainAccount(parms) {
+  //編輯主科目
+  async editMainAccount(parms) {
     let response;
     parms.main_id = null;
 
@@ -41,8 +41,8 @@ export default {
       return error;
     }
   },
-  //新增子科目
-  async addSubAccount(parms) {
+  //編輯子科目
+  async editSubAccount(parms) {
     let response;
 
     try {

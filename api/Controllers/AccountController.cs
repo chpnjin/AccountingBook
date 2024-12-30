@@ -87,17 +87,28 @@ namespace api.Controllers
         {
             try
             {
-                var sql = @"
-                INSERT INTO accounts (no, name, type,main_id, description)
-                VALUES (@no, @name, @type, @main_id, @description)
-                ON DUPLICATE KEY UPDATE
-                    name = @name,
-                    type = @type,
-                    main_id = @main_id,
-                    description = @description,
-                    last_updated_time = CURRENT_TIMESTAMP";
+                string sqlStr = "";
 
-                await _connection.ExecuteAsync(sql, parms);
+                if (parms.id is null)
+                {
+                    sqlStr = @"INSERT INTO accounts (no, name, type, main_id, description)
+                    VALUES (@no, @name, @type, @main_id, @description)
+                    ";
+                }
+                else
+                {
+                    sqlStr = @"UPDATE accounts
+                                  SET no = @no,
+                                    name = @name,
+                                   type = @type,
+                                main_id = @main_id,
+                            description = @description,
+                                 active = TRUE,
+                      last_updated_time = CURRENT_TIMESTAMP() 
+                               WHERE id = @id";
+                }
+
+                await _connection.ExecuteAsync(sqlStr, parms);
 
                 return Ok("Done");
             }
