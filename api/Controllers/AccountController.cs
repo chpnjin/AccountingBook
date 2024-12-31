@@ -1,15 +1,9 @@
 ﻿using api.Models;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MySqlConnector;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Data;
-using System.Data.SqlTypes;
-using System.Security.Principal;
-using System.Xml.Linq;
 
 namespace api.Controllers
 {
@@ -76,6 +70,26 @@ namespace api.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("CheckAccountExist")]
+        public async Task<ActionResult> CheckAccountExist(string accountNo)
+        {
+            try
+            {
+                string sql = @"SELECT COUNT(no) FROM accounts WHERE no = @accountNo";
+
+                var data = await _connection.QueryAsync<int>(sql, new { accountNo });
+
+                var result = data.FirstOrDefault() > 0 ? true : false;
+
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         /// <summary>
         /// 編輯科目

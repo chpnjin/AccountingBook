@@ -60,6 +60,8 @@ import {
   toRaw,
 } from "vue";
 
+import accountService from "@/services/accountService"; //API呼叫服務
+
 //定義可在父組件設定屬性
 const props = defineProps({
   title: {
@@ -168,7 +170,7 @@ const closeDialog = () => {
   emit("close"); // 觸發對話框關閉事件
 };
 
-const saveAccount = () => {
+const saveAccount = async () => {
   noError.value = !account.no.trim();
   nameError.value = !account.name.trim();
   descriptionError.value = !account.description.trim();
@@ -179,6 +181,14 @@ const saveAccount = () => {
 
   if (noError.value || nameError.value || descriptionError.value) {
     return;
+  }
+
+  let idExist = await accountService.accountIdExist(account.no);
+
+  if(idExist){
+    noError.value = true;
+    noErrorMessage.value = "該科目編號已存在";
+    return
   }
 
   account.main_id = props.parentAccount.id;

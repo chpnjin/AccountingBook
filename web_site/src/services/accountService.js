@@ -17,7 +17,7 @@ export default {
   async getSubAccounts(mainId) {
     let response;
     let parms = {
-      main_id : mainId
+      main_id: mainId
     }
 
     try {
@@ -27,6 +27,23 @@ export default {
       console.info(error);
       return [];
     }
+  },
+  //檢查ID是否已存在
+  async accountIdExist(accountNo) {
+    let response;
+
+    try {
+      response = await axios.get(`api/Account/CheckAccountExist?accountNo=${accountNo}`).then((result)=>{
+        return result.data;
+      });
+
+      return response;
+
+    } catch (error) {
+      console.info(error);
+      return error;
+    }
+
   },
   //編輯主科目
   async editMainAccount(parms) {
