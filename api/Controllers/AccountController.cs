@@ -29,7 +29,7 @@ namespace api.Controllers
             try
             {
                 string sql = @"SELECT id,no,name,type,description,active 
-                             FROM accounts
+                             FROM account
                             WHERE main_id IS NULL";
 
                 var data = await _connection.QueryAsync<dynamic>(sql);
@@ -55,7 +55,7 @@ namespace api.Controllers
             try
             {
                 string sql = @"SELECT id,no,name,type,description,active 
-                             FROM accounts
+                             FROM account
                             WHERE main_id = @main_id "
                 ;
 
@@ -70,13 +70,18 @@ namespace api.Controllers
             }
         }
 
+        /// <summary>
+        /// 檢查科目編號是否已存在
+        /// </summary>
+        /// <param name="accountNo"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpGet("CheckAccountExist")]
         public async Task<ActionResult> CheckAccountExist(string accountNo)
         {
             try
             {
-                string sql = @"SELECT COUNT(no) FROM accounts WHERE no = @accountNo";
+                string sql = @"SELECT COUNT(no) FROM account WHERE no = @accountNo";
 
                 var data = await _connection.QueryAsync<int>(sql, new { accountNo });
 
@@ -105,13 +110,13 @@ namespace api.Controllers
 
                 if (parms.id is null)
                 {
-                    sqlStr = @"INSERT INTO accounts (no, name, type, main_id, description)
+                    sqlStr = @"INSERT INTO account (no, name, type, main_id, description)
                     VALUES (@no, @name, @type, @main_id, @description)
                     ";
                 }
                 else
                 {
-                    sqlStr = @"UPDATE accounts
+                    sqlStr = @"UPDATE account
                                   SET no = @no,
                                     name = @name,
                                    type = @type,

@@ -4,8 +4,8 @@
         context: ./api  # NET8 API專案在 api 目錄下
         dockerfile: Dockerfile
     environment:
-      # - SQL_CONNECTION_STRING=Server=175.182.6.36,3306;Database=accounting;User=jim;Password=Syno[0912]logy;
-      - SQL_CONNECTION_STRING=Server=my-db;Database=accounting;User=jim;Password=doc[0912]Ker;
+      - SQL_CONNECTION_STRING=Server=175.182.6.36,3306;Database=accounting;User=jim;Password=Syno[0912]logy;
+      # - SQL_CONNECTION_STRING=Server=my-db;Database=accounting;User=jim;Password=doc[0912]Ker;
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081

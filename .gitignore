@@ -46,3 +46,8 @@
 /obj/Docker/docker-compose.vs.release.partial.g.yml
 *.user
 *.dll
+/bin
+/obj
+/api/.config
+/api/bin/Release
+/api/obj/Container/AbsoluteOutputAssemblyPath.cache

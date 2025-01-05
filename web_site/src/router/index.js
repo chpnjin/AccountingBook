@@ -1,30 +1,33 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import store from '../store'; // 使用 Vuex 管理狀態
 import Home from '@/views/_home.vue'
 import Main from '@/layouts/MainLayout.vue';
 import Login from '@/views/LoginPage.vue';
+import JE from '@/views/je-main.vue';
 import JE_Edit from '@/views/je-edit.vue';
 import JE_Approval from '@/views/je-approval.vue';
 import Report_IncomeStatement from '@/views/report-income-statement.vue';
 import Report_BalanceSheet from '@/views/report-balance-sheet.vue';
 import Setup_User from '@/views/setup-user.vue';
 import Setup_Accounts from '@/views/setup-accounts.vue';
-
+import { compile } from 'vue';
+import store from '../store'; // 使用 Vuex 管理狀態
 
 //定義路由
+//je = Journal Entry 縮寫，中文意思是 分錄 或 日記帳分錄
 const routes = [
   {
     path: '/',
     name: 'Main',
     component: Main,
-    children:[
-      { path: '', name:'home',component:Home },
-      { path: 'je-edit', name: 'je-edit', component: JE_Edit },
-      { path: 'je-approval', name: 'je-approval', component: JE_Approval },
-      { path: 'report-income-statement', name: 'report-income-statement', component: Report_IncomeStatement },
-      { path: 'report-balance-sheet', name: 'report-balance-sheet', component: Report_BalanceSheet },
-      { path: 'setup-user', name: 'setup-user', component: Setup_User },
-      { path: 'setup-accounts', name: 'setup-accounts', component: Setup_Accounts }
+    children: [
+      { path: '', name: 'home', component: Home },
+      { path: 'je', name: 'je', component: JE },
+      { path: 'je/edit', name: 'je-edit', component: JE_Edit },
+      { path: 'je/approval', name: 'je-approval', component: JE_Approval },
+      { path: 'report/income-statement', name: 'report-income-statement', component: Report_IncomeStatement },
+      { path: 'report/balance-sheet', name: 'report-balance-sheet', component: Report_BalanceSheet },
+      { path: 'setup/user', name: 'setup-user', component: Setup_User },
+      { path: 'setup/accounts', name: 'setup-accounts', component: Setup_Accounts }
     ],
     meta: { requiresAuth: true } //需要驗證
   },
@@ -46,7 +49,7 @@ router.beforeEach(async (to, from, next) => {
   //若此路由需要驗證且無驗證資訊時,導向登入頁
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!localStorage.getItem('token')) {
-      next({ path: '/login'});
+      next({ path: '/login' });
     } else {
       next();
     }

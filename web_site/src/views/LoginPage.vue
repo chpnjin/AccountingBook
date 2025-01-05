@@ -25,7 +25,7 @@ export default {
     };
   },
   methods: {
-    btnLogin_click() {
+    async btnLogin_click() {
       try {
         const loginParams = {
           id: this.id,
@@ -41,6 +41,7 @@ export default {
           return;
         }
 
+        this.message = "登入中...";
         UserService.loginVerification(loginParams)
           .then((response) => {
             //檢查結果是否包含token
@@ -49,6 +50,7 @@ export default {
               localStorage.setItem("token", response.token);
               localStorage.setItem("user-name", response.name);
               // 導向主頁
+              this.message = "登入成功，準備導向主頁...";
               this.$router.push("/");
             } else {
               this.message = response.msg;
@@ -64,7 +66,6 @@ export default {
     async callApiTest() {
       try {
         let result = await UserService.callApiTest();
-        console.info(result);
       } catch (error) {
         console.error("API測試失敗:", error);
       }

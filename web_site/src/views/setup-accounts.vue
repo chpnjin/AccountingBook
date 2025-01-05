@@ -56,7 +56,7 @@ import accountService from "@/services/accountService"; //API呼叫服務
 import "tabulator-tables/dist/css/tabulator_simple.min.css"; // 引入 simple 主題
 import editDialog from "@/components/Dialog_Account.vue"; //引用彈出視窗組件
 import editSubDialog from "@/components/Dialog_SubAccount.vue"; //引用彈出視窗組件
-import accountTypes from "@/config/type-list.js";
+import accountTypes from "@/config/text-value.js";
 
 //引用物件
 const dialogTitle = ref(""); //彈窗標題
@@ -94,7 +94,7 @@ onMounted(async () => {
         formatter: (cell) => {
           const value = cell.getValue();
           const foundType = accountTypes.find((x) => x.value === value);
-          return foundType ? foundType.title : "未找到"; // 如果找不到則回傳 "未找到"
+          return foundType ? foundType.text : "未找到"; // 如果找不到則回傳 "未找到"
         },
       },
       { title: "描述", field: "description", widthGrow: 1 }, // 描述欄位填滿剩餘寬度
@@ -160,7 +160,7 @@ onMounted(async () => {
       //科目類型中文名稱
       typeName.value = accountTypes.find(
         (x) => x.value === selectedMain.value.type
-      ).title;
+      ).text;
       //重讀子科目
       reloadSub(selectedMain.value.id);
     }

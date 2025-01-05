@@ -5,7 +5,7 @@
         <a href="#" class="nav-item" @click.prevent="toggleSubMenu('JournalEntry')">傳票作業</a>
         <ul v-show="isSubMenuOpen.JournalEntry" class="sub-menu">
           <li>
-            <a href="#" class="sub-nav-item" @click.prevent="navigateTo('je-edit')">編輯</a>
+            <a href="#" class="sub-nav-item" @click.prevent="navigateTo('je')">編輯</a>
           </li>
           <li>
             <a href="#" class="sub-nav-item" @click.prevent="navigateTo('je-approval')">審核</a>

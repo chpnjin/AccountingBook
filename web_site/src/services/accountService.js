@@ -9,7 +9,6 @@ export default {
       response = await axios.post("api/Account/GetMainAccounts");
       return response.data;
     } catch (error) {
-      console.info(error);
       return [];
     }
   },
@@ -24,7 +23,6 @@ export default {
       response = await axios.post("api/Account/GetSubAccounts", parms);
       return response.data;
     } catch (error) {
-      console.info(error);
       return [];
     }
   },

@@ -183,18 +183,19 @@ const saveAccount = async () => {
     return;
   }
 
-  let idExist = await accountService.accountIdExist(account.no);
+  if (props.title.includes("新增")) {
+    let idExist = await accountService.accountIdExist(account.no);
 
-  if(idExist){
-    noError.value = true;
-    noErrorMessage.value = "該科目編號已存在";
-    return
+    if (idExist) {
+      noError.value = true;
+      noErrorMessage.value = "該科目編號已存在";
+      return;
+    }
   }
 
   account.main_id = props.parentAccount.id;
   account.type = props.parentAccount.type;
 
-  console.info(account);
   emit("save", toRaw(account)); //觸發save事件
   closeDialog();
 };

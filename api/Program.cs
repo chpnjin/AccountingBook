@@ -93,7 +93,15 @@ try
         app.UseSwaggerUI();
     }
 
+    var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+    if (allowedOrigins == null)
+    {
+        allowedOrigins = new string[] { "" };
+    }
+
     app.UseCors(builder => builder
+    .WithOrigins(allowedOrigins)
     .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")     // Allow all ports on localhost
     .AllowAnyMethod()                     // 允許任何方法
     .AllowAnyHeader()                     // 允許任何標頭
