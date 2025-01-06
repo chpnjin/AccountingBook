@@ -6,7 +6,7 @@ WORKDIR /src/api
 COPY ["api.csproj", "."]
 RUN dotnet restore "api.csproj"
 
-ENV SQL_CONNECTION_STRING="Server=175.182.6.36,3306;Database=accounting;User Id=root;Password=1qaz@WSX;"
+ENV SQL_CONNECTION_STRING=""
 
 # 複製剩餘檔案並構建應用
 COPY . .
