@@ -13,7 +13,7 @@
             <input
               type="text"
               v-model="selectedMainAcctName"
-              placeholder="搜尋..."
+              placeholder="請選擇..."
               @focus="handleFocus"
               @blur="handleBlur"
               @input="filterOptions"
@@ -80,12 +80,10 @@ let loading = false;
 watch(
   () => props.visible,
   async (isOpen) => {
-    await nextTick(); // 確保 DOM 已經渲染
-    if (isOpen) {
-      //主科目下拉選單
-
-      //子科目表格
-      if (!dtObj.value) {
+    // 確保 DOM 已經渲染
+    await nextTick()
+      .then(() => {
+        //子科目表格
         dtObj.value = new Tabulator(dtDialogElm.value, {
           layout: "fitColumns",
           height: "400px",
@@ -105,6 +103,9 @@ watch(
             }
           },
         });
+        return;
+      })
+      .then(() => {
         dtDialogElm.value.classList.add("my-table");
 
         //事件:子科目列選取
@@ -114,12 +115,7 @@ watch(
           }
           choicedSubAcct.value = row.isSelected() ? false : true;
         });
-      }
-    } else {
-      if (dtObj.value) {
-        dtObj.value = null; // 清除實例
-      }
-    }
+      });
 
     //從DB抓取主科目選項
     let result = await service.getMainAccounts();

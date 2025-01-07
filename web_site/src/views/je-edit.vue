@@ -3,24 +3,28 @@
   <h3>編輯傳票</h3>
   <div class="container">
     <div class="item">
-      <label>傳票編號</label> <input type="text" :value="txNo" />
+      <label>編號</label> <input type="text" :value="txNo" />
     </div>
     <div class="item">
-      <label for="select-option">傳票類型</label>
+      <label for="select-option">類型</label>
       <select id="select-option" v-model="vchrType">
         <option v-for="item in vchrType" :key="item.value" :value="item.value">
           {{ item.text }}
         </option>
       </select>
     </div>
-    <div class="item"><label>傳票日期</label> <input type="date" /></div>
+    <div class="item"><label>日期</label> <input type="date" /></div>
     <div class="summary">
-      <label for="summary-input">傳票摘要</label>
+      <label for="summary-input">摘要</label>
       <input type="text" id="summary-input" v-model="summary" />
     </div>
   </div>
-  <div ref="pagerElm">
-    <button @click="addAccount">＋</button>
+  <div id="topTools">
+    <div>
+      <button @click="addAccount">＋</button>
+      <button @click="deleteAccount" :disabled="noSelected">Ｘ</button>
+    </div>
+    <p ref="pagerElm"></p>
   </div>
   <div ref="dtElm"></div>
   <button @click="save">儲存</button>
@@ -56,7 +60,9 @@ const vchrType = [
   { text: "現金支出", value: "" },
   { text: "轉帳", value: "" },
 ];
+const noSelected = ref(true);
 let loading = false;
+let selectedRow = null;
 
 //初次讀取
 onMounted(async () => {
@@ -110,9 +116,12 @@ onMounted(async () => {
     paginationElement: pagerElm.value,
     paginationAddRow: "table",
   });
-
+  //選中資料
   dtObj.value.on("rowClick", (e, row) => {
-    let rowData = row.getData();
+    noSelected.value = row.isSelected() ? false : true;
+    if (row.isSelected()) {
+      selectedRow = row;
+    }
   });
 
   //初次載入時抓取資料
@@ -164,21 +173,31 @@ const dialogClosed = () => {
 const insertAcct = (acct) => {
   selectAcctDialogVisible.value = false;
   dtObj.value.addRow({
-    id : acct.id,
-    accountNo : acct.no,
-    accountName : acct.name,
-    summary : '',  //
-    'amount-D' : '',
-    'amount-C' : ''
+    id: acct.id,
+    accountNo: acct.no,
+    accountName: acct.name,
+    summary: "",
+    "amount-D": "",
+    "amount-C": "",
   });
 };
 
+const deleteAccount = () => {
+   selectedRow.delete();
+};
+
+//打包畫面資料
+const packData = () => {};
+
 //儲存
 const save = () => {
+  console.info("save");
   if (checkBalance() == false) {
     return;
   }
-  console.info("save");
+
+  
+
   //router.push({ path: "/je" });
 };
 
@@ -253,8 +272,10 @@ const cancel = () => {
     margin-bottom: 5px;
   }
 }
-
-.tabulator-footer {
-  font: 30px;
+/* 工具列 */
+#topTools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

@@ -51,3 +51,5 @@
 /api/.config
 /api/bin/Release
 /api/obj/Container/AbsoluteOutputAssemblyPath.cache
+/api/bin
+/api/obj

@@ -16,15 +16,15 @@
 <script setup>
 import { ref, reactive, onMounted, nextTick } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
-import { useRouter } from 'vue-router';
-import service from "@/services/txService"; //API呼叫服務
+import { useRouter } from "vue-router";
+import service from "@/services/voucherService"; //API呼叫服務
 import "tabulator-tables/dist/css/tabulator.min.css";
 import valList from "@/config/text-value.js";
 
 const router = useRouter();
 const dtObj = ref(Tabulator);
 const dtElm = ref(null);
-let dtData = reactive([]);
+let dtData = [];
 let updateBtnDisable = ref(true);
 let loading = false;
 let selectedNo = ""; //被選中的傳票編號
@@ -32,9 +32,8 @@ let selectedNo = ""; //被選中的傳票編號
 //重抓交易紀錄
 const reload_je = async () => {
   loading = true;
-  let response = await service.getTxList();
+  let response = await service.getVoucherList();
   dtData.push(...response);
-  dtObj.value.setData(dtData);
   loading = false;
 };
 
@@ -44,6 +43,7 @@ onMounted(async () => {
     layout: "fitColumns",
     height: "400px",
     selectableRows: 1, //只允許單行選擇
+    reactiveData: true, //設定響應式資料
     columns: [
       { title: "ID", field: "id", visible: false, sorter: "number" },
       { title: "編號", field: "no", width: 100 },

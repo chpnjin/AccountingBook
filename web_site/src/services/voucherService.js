@@ -1,13 +1,14 @@
-import axios from "../services/_axios";
+import axios from "./_axios";
 //模擬讀取等待
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 
 export default {
-  //取得交易紀錄
-  async getTxList(searchCondition) {
-    let result;
+  //取得傳票清單
+  async getVoucherList(searchCondition) {
+    let result = [];
+    // result = await axios.post("",searchCondition);
 
-    await sleep(3000);
+    // await sleep(3000);
 
     //測試資料
     result = [
@@ -71,10 +72,9 @@ export default {
 
     return result;
   },
-
   //取得交易明細
-  async getTxDetail(id){
-    let result = {};
+  async getVoucherDetail(id){
+    let result = await axios.post("",id);
 
     // await sleep(3000);
 
@@ -88,6 +88,11 @@ export default {
     };
 
     return result;
-  }
+  },
+  //
+  async editVoucher(data){
+    let result = await axios.post("",data);
 
+    return result;
+  }
 }

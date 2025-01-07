@@ -1,4 +1,4 @@
-DROP TABLE account;
+DROP TABLE IF EXISTS account;
 CREATE TABLE account (
     id INT PRIMARY KEY AUTO_INCREMENT COMMENT '主鍵，科目唯一識別碼',
     no VARCHAR(20) NOT NULL UNIQUE COMMENT '科目編號，通常是會計科目的標識號，如 "1010" 或 "2020"',
