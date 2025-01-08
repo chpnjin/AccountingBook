@@ -137,6 +137,7 @@ namespace api.Controllers
                 return Ok(new
                 {
                     token,
+                    user.id,
                     user.full_name
                 });
             }

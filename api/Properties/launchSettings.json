@@ -5,7 +5,11 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "SQL_CONNECTION_STRING": "Server=175.182.6.36,3306;Database=accounting;User=jim;Password=Syno[0912]logy",
+        "Jwt:Key": "your-very-very-secret-and-long-key-for-256-bits",
+        "Jwt:Issuer": "YourIssuer",
+        "Jwt:Audience": "YourAudience"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5062"
@@ -34,10 +38,21 @@
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
         "ASPNETCORE_HTTPS_PORTS": "8081",
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "ASPNETCORE_HTTP_PORTS": "8080",
+        "SQL_CONNECTION_STRING": "Server=175.182.6.36,3306;Database=accounting;User=jim;Password=Syno[0912]logy"
       },
       "publishAllPorts": true,
       "useSSL": true
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "launchBrowser": true,
+      "launchUrl": "https://localhost:7130/swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://localhost:7130;http://localhost:5062"
+      },
+      "distributionName": ""
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",

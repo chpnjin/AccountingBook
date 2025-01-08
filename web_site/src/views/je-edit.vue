@@ -3,20 +3,22 @@
   <h3>編輯傳票</h3>
   <div class="container">
     <div class="item">
-      <label>編號</label> <input type="text" :value="txNo" />
+      <label>編號</label> <input type="text" v-model="master.no" disabled />
     </div>
     <div class="item">
       <label for="select-option">類型</label>
-      <select id="select-option" v-model="vchrType">
+      <select id="select-option" v-model="master.voucher_type">
         <option v-for="item in vchrType" :key="item.value" :value="item.value">
           {{ item.text }}
         </option>
       </select>
     </div>
-    <div class="item"><label>日期</label> <input type="date" /></div>
+    <div class="item">
+      <label>日期</label> <input type="date" v-model="master.entry_date" />
+    </div>
     <div class="summary">
       <label for="summary-input">摘要</label>
-      <input type="text" id="summary-input" v-model="summary" />
+      <input type="text" id="summary-input" v-model="master.summary" />
     </div>
   </div>
   <div id="topTools">
@@ -27,9 +29,11 @@
     <p ref="pagerElm"></p>
   </div>
   <div ref="dtElm"></div>
-  <button @click="save">儲存</button>
-  <button @click="submit">送審</button>
-  <button @click="cancel">取消</button>
+  <div class="btnBar">
+    <button @click="save">儲存</button>
+    <button @click="submit">送審</button>
+    <button @click="cancel">取消</button>
+  </div>
   <editDialog
     :visible="selectAcctDialogVisible"
     :title="dialogTitle"
@@ -39,93 +43,118 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from "vue";
+import { ref, reactive, toRaw, onMounted, nextTick } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import editDialog from "@/components/Dialog_ChoiceAcct.vue"; //選擇科目彈窗
 import "tabulator-tables/dist/css/tabulator.min.css";
 import { useRouter } from "vue-router";
+import service from "@/services/voucherService"; //API
 
 const router = new useRouter();
-const txNo = ref("D20250103001");
 const dtObj = ref(Tabulator);
 const dtElm = ref(null);
 const pagerElm = ref(null);
 const dtData = reactive([]);
-const summary = ref("");
 const selectAcctDialogVisible = ref(false);
 const dialogTitle = ref("");
 const vchrType = [
-  { text: "期初開帳", value: "" },
-  { text: "現金收入", value: "" },
-  { text: "現金支出", value: "" },
-  { text: "轉帳", value: "" },
+  { text: "期初開帳", value: "opening" },
+  { text: "現金收入", value: "income" },
+  { text: "現金支出", value: "expense" },
+  { text: "轉帳", value: "transfer" },
 ];
 const noSelected = ref(true);
 let loading = false;
-let selectedRow = null;
+let selectedRow;
+//單頭資料
+const master = reactive({
+  no: "",
+  entry_date: "",
+  voucher_type: "",
+  summary: "",
+  handler: localStorage.getItem("id"),
+  status: "unapproved",
+});
 
 //初次讀取
 onMounted(async () => {
-  dtObj.value = new Tabulator(dtElm.value, {
-    layout: "fitColumns",
-    height: "400px",
-    selectableRows: 1, //只允許單行選擇
-    columns: [
-      { title: "ID", field: "id", visible: false, sorter: "number" },
-      { title: "科目編號", field: "accountNo", width: 100 },
-      { title: "科目名稱", field: "accountName", width: 100 },
-      {
-        title: "摘要",
-        field: "summary",
-        editor: "input",
-        width: 380,
-      },
-      {
-        title: "借方",
-        field: "amount-D",
-        editor: "input",
-        width: 100,
-        bottomCalc: "sum", // 底部顯示總和
-        bottomCalcFormatter: moneyFormatter, // 格式化為金額
-        formatter: moneyFormatter,
-        hozAlign: "right",
-      },
-      {
-        title: "貸方",
-        field: "amount-C",
-        editor: "input",
-        width: 100,
-        bottomCalc: "sum", // 底部顯示總和
-        bottomCalcFormatter: moneyFormatter, // 格式化為金額
-        formatter: moneyFormatter,
-        hozAlign: "right",
-      },
-    ],
-    data: [], // 將假資料放入
-    placeholder: () => {
-      if (loading) {
-        return "資料載入中..."; // 顯示載入中訊息
-      } else if (dtData.length == 0) {
-        return "沒有資料"; // 顯示沒有資料訊息
-      } else {
-        return ""; // 有資料時不顯示任何訊息
-      }
-    },
-    pagination: true,
-    paginationSize: 10,
-    paginationElement: pagerElm.value,
-    paginationAddRow: "table",
-  });
-  //選中資料
-  dtObj.value.on("rowClick", (e, row) => {
-    noSelected.value = row.isSelected() ? false : true;
-    if (row.isSelected()) {
-      selectedRow = row;
-    }
-  });
+  await nextTick()
+    .then(() => {
+      dtObj.value = new Tabulator(dtElm.value, {
+        layout: "fitColumns",
+        height: "400px",
+        selectableRows: 1, //只允許單行選擇
+        columns: [
+          {
+            title: "ID",
+            field: "account_id",
+            visible: false,
+            sorter: "number",
+          },
+          { title: "科目編號", field: "account_no", width: 100 },
+          { title: "科目名稱", field: "account_name", width: 100 },
+          {
+            title: "摘要",
+            field: "summary",
+            editor: "input",
+            width: 380,
+          },
+          {
+            title: "借方",
+            field: "debit_amount",
+            editor: "input",
+            width: 100,
+            bottomCalc: "sum", // 底部顯示總和
+            bottomCalcFormatter: moneyFormatter, // 格式化為金額
+            formatter: moneyFormatter,
+            hozAlign: "right",
+          },
+          {
+            title: "貸方",
+            field: "credit_amount",
+            editor: "input",
+            width: 100,
+            bottomCalc: "sum", // 底部顯示總和
+            bottomCalcFormatter: moneyFormatter, // 格式化為金額
+            formatter: moneyFormatter,
+            hozAlign: "right",
+          },
+        ],
+        data: [], // 將假資料放入
+        placeholder: () => {
+          if (loading) {
+            return "資料載入中..."; // 顯示載入中訊息
+          } else if (dtData.length == 0) {
+            return "沒有資料"; // 顯示沒有資料訊息
+          } else {
+            return ""; // 有資料時不顯示任何訊息
+          }
+        },
+        pagination: true,
+        paginationSize: 10,
+        paginationElement: pagerElm.value,
+        paginationAddRow: "table",
+      });
+    })
+    .then(() => {
+      //選中資料
+      dtObj.value.on("rowClick", (e, row) => {
+        noSelected.value = row.isSelected() ? false : true;
+        if (row.isSelected()) {
+          selectedRow = row;
+        }
+      });
+    });
+  // 網址帶參數時重抓資料
+  let voucherNo = router.currentRoute.value.query.no;
+  if (voucherNo) {
+    let result = await service.getVoucherDetail(voucherNo);
 
-  //初次載入時抓取資料
-  await nextTick();
+    if (result) {
+      Object.assign(master, result.master);
+      dtObj.value.setData(result.detail);
+    }
+  }
 });
 
 //金額格式
@@ -145,8 +174,8 @@ const checkBalance = () => {
   let calcResults = dtObj.value.getCalcResults();
 
   // 獲取借方與貸方總和
-  let sumAmountD = calcResults.bottom["amount-D"];
-  let sumAmountC = calcResults.bottom["amount-C"];
+  let sumAmountD = calcResults.bottom["debit_amount"];
+  let sumAmountC = calcResults.bottom["credit_amount"];
 
   if (sumAmountD == 0 && sumAmountC == 0) {
     console.info("借貸金額不得同時為0");
@@ -173,46 +202,57 @@ const dialogClosed = () => {
 const insertAcct = (acct) => {
   selectAcctDialogVisible.value = false;
   dtObj.value.addRow({
-    id: acct.id,
-    accountNo: acct.no,
-    accountName: acct.name,
+    account_id: acct.id,
+    account_no: acct.no,
+    account_name: acct.name,
     summary: "",
-    "amount-D": "",
-    "amount-C": "",
+    debit_amount: 0,
+    credit_amount: 0,
   });
 };
 
 const deleteAccount = () => {
-   selectedRow.delete();
+  selectedRow.delete();
 };
 
 //打包畫面資料
-const packData = () => {};
+const packData = () => {
+  let data = {};
+  let items = dtObj.value.getData();
+  data.master = toRaw(master);
+  data.detail = items;
+
+  return data;
+};
 
 //儲存
-const save = () => {
-  console.info("save");
+const save = async () => {
   if (checkBalance() == false) {
     return;
   }
 
-  
+  let result = await service.editVoucher(packData());
 
-  //router.push({ path: "/je" });
+  if (result == "Done") {
+    alert("儲存成功");
+    router.push({ path: "/je" });
+  } else {
+    let msg = "儲存失敗，訊息: \n" + result;
+    alert(msg);
+  }
 };
 
 //送審
 const submit = () => {
-  console.info("submit");
-  if (checkBalance == false) {
+  if (checkBalance() == false) {
     return;
   }
 
   // router.push({ path: "/je" });
 };
+
 //取消編輯
 const cancel = () => {
-  console.info("cancel");
   router.push({ path: "/je" });
 };
 </script>
@@ -277,5 +317,14 @@ const cancel = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.btnBar {
+  display: flex;
+  justify-content: space-around;
+  padding: 5px;
+}
+.btnBar button {
+  font-size: x-large;
+  width: 200px;
 }
 </style>

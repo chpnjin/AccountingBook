@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:300/", //設定API位置
+  baseURL: "http://localhost:5062/", //設定API位置
   timeout: 50000, //等待Server回應時限
 });
 

@@ -48,7 +48,8 @@ export default {
             if (response.token) {
               //儲存token備用
               localStorage.setItem("token", response.token);
-              localStorage.setItem("user-name", response.name);
+              localStorage.setItem("id", response.id);
+              localStorage.setItem("name", response.name);
               // 導向主頁
               this.message = "登入成功，準備導向主頁...";
               this.$router.push("/");

@@ -19,22 +19,22 @@
 </template>
 
 <script>
-import SidebarNav from '@/components/SidebarNav.vue';
+import SidebarNav from "@/components/SidebarNav.vue";
 
 export default {
-  name: 'MainLayout',
+  name: "MainLayout",
   components: {
     SidebarNav,
-  },data() {
+  },
+  data() {
     return {
-      username: localStorage.getItem('user-name') || '未知用戶'
+      username: localStorage.getItem("name") || "未知用戶",
     };
   },
   methods: {
     logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user-name');
-      this.$router.push('/login');
+      localStorage.clear();
+      this.$router.push("/login");
     },
   },
 };
@@ -57,13 +57,13 @@ export default {
   color: #fff;
   padding: 10px 20px; /* 增加內邊距 */
   justify-content: flex-end; /* 將內容推到右邊 */
-  align-items:end; /* 垂直居中 */
+  align-items: end; /* 垂直居中 */
   box-sizing: border-box;
 }
 
 .user-info {
   display: flex;
-  align-items:end;
+  align-items: end;
   gap: 10px; /* 文字和按鈕之間的間距 */
 }
 

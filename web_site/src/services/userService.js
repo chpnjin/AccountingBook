@@ -19,9 +19,10 @@ export default {
     let response = await axios.post('api/User/LoginVerification', parm).then((axios) => {
       return {
         "token": axios.data.token,
+        "id" : axios.data.id,
         "name" : axios.data.full_name
       };
-      
+
     }).catch((error) => {
       return { "msg": error.response.data };
     });

@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, computed, defineProps, defineEmits } from "vue";
+import { ref, watch, nextTick, defineProps, defineEmits } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import "tabulator-tables/dist/css/tabulator.min.css";
 import service from "@/services/accountService"; //API
@@ -80,43 +80,43 @@ let loading = false;
 watch(
   () => props.visible,
   async (isOpen) => {
-    // 確保 DOM 已經渲染
-    await nextTick()
-      .then(() => {
-        //子科目表格
-        dtObj.value = new Tabulator(dtDialogElm.value, {
-          layout: "fitColumns",
-          height: "400px",
-          selectableRows: 1,
-          columns: [
-            { title: "ID", field: "id", visible: false, sorter: "number" },
-            { title: "科目編號", field: "no", width: 100 },
-            { title: "科目名稱", field: "name", width: 320 },
-          ],
-          placeholder: () => {
-            if (loading) {
-              return "資料載入中..."; // 顯示載入中訊息
-            } else if (dtSubAcctList.length == 0) {
-              return "沒有資料"; // 顯示沒有資料訊息
-            } else {
-              return ""; // 有資料時不顯示任何訊息
+    if (isOpen) {
+      // 確保 DOM 已經渲染
+      await nextTick()
+        .then(() => {
+          //子科目表格
+          dtObj.value = new Tabulator(dtDialogElm.value, {
+            layout: "fitColumns",
+            height: "400px",
+            selectableRows: 1,
+            columns: [
+              { title: "ID", field: "id", visible: false, sorter: "number" },
+              { title: "科目編號", field: "no", width: 100 },
+              { title: "科目名稱", field: "name", width: 320 },
+            ],
+            placeholder: () => {
+              if (loading) {
+                return "資料載入中..."; // 顯示載入中訊息
+              } else if (dtSubAcctList.length == 0) {
+                return "沒有資料"; // 顯示沒有資料訊息
+              } else {
+                return ""; // 有資料時不顯示任何訊息
+              }
+            },
+          });
+          return;
+        })
+        .then(() => {
+          dtObj.value.on("rowClick", function (e, row) {
+            if (row.isSelected()) {
+              selectedSubAcct = row.getData();
+              console.info(selectedSubAcct);
             }
-          },
+            choicedSubAcct.value = row.isSelected() ? false : true;
+          });
+          dtDialogElm.value.classList.add("my-table");
         });
-        return;
-      })
-      .then(() => {
-        dtDialogElm.value.classList.add("my-table");
-
-        //事件:子科目列選取
-        dtObj.value.on("rowClick", (e, row) => {
-          if (row.isSelected()) {
-            selectedSubAcct = row.getData();
-          }
-          choicedSubAcct.value = row.isSelected() ? false : true;
-        });
-      });
-
+    }
     //從DB抓取主科目選項
     let result = await service.getMainAccounts();
     mainAcctList.value = result.map((account) => ({

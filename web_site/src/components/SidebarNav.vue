@@ -2,35 +2,54 @@
   <nav class="sidebar">
     <ul>
       <li>
-        <a href="#" class="nav-item" @click.prevent="toggleSubMenu('JournalEntry')">傳票作業</a>
+        <a
+          href="#"
+          class="nav-item"
+          @click.prevent="toggleSubMenu('JournalEntry')"
+          >傳票作業</a
+        >
         <ul v-show="isSubMenuOpen.JournalEntry" class="sub-menu">
           <li>
-            <a href="#" class="sub-nav-item" @click.prevent="navigateTo('je')">編輯</a>
+            <router-link to="/je" class="sub-nav-item">編輯</router-link>
           </li>
           <li>
-            <a href="#" class="sub-nav-item" @click.prevent="navigateTo('je-approval')">審核</a>
+            <router-link to="/je/approval" class="sub-nav-item"
+              >審核</router-link
+            >
           </li>
         </ul>
       </li>
       <li>
-        <a href="#" class="nav-item" @click.prevent="toggleSubMenu('Report')">報表</a>
+        <a href="#" class="nav-item" @click.prevent="toggleSubMenu('Report')"
+          >報表</a
+        >
         <ul v-show="isSubMenuOpen.Report" class="sub-menu">
           <li>
-            <a href="#" class="sub-nav-item" @click.prevent="navigateTo('report-income-statement')">損益表</a>
+            <router-link to="/report/income-statement" class="sub-nav-item"
+              >損益表</router-link
+            >
           </li>
           <li>
-            <a href="#" class="sub-nav-item" @click.prevent="navigateTo('report-balance-sheet')">資產負債表</a>
+            <router-link to="/report/balance-sheet" class="sub-nav-item"
+              >資產負債表</router-link
+            >
           </li>
         </ul>
       </li>
       <li>
-        <a href="#" class="nav-item" @click.prevent="toggleSubMenu('Setup')">設定</a>
+        <a href="#" class="nav-item" @click.prevent="toggleSubMenu('Setup')"
+          >設定</a
+        >
         <ul v-show="isSubMenuOpen.Setup" class="sub-menu">
           <li>
-            <a href="#" class="sub-nav-item" @click.prevent="navigateTo('setup-user')">使用者</a>
+            <router-link to="/setup/user" class="sub-nav-item"
+              >使用者</router-link
+            >
           </li>
           <li>
-            <a href="#" class="sub-nav-item" @click.prevent="navigateTo('setup-accounts')">科目</a>
+            <router-link to="/setup/accounts" class="sub-nav-item"
+              >科目</router-link
+            >
           </li>
         </ul>
       </li>
@@ -40,7 +59,7 @@
 
 <script>
 export default {
-  name: 'SidebarNav',
+  name: "SidebarNav",
   data() {
     return {
       //預設隱藏
@@ -55,9 +74,6 @@ export default {
     //點選主項目時收放子項目清單
     toggleSubMenu(menu) {
       this.isSubMenuOpen[menu] = !this.isSubMenuOpen[menu];
-    },
-    navigateTo(routeName) {
-      this.$router.push({ name: routeName }); // 切換到對應路由
     },
   },
 };

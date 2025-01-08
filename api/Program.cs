@@ -6,12 +6,17 @@ using Microsoft.OpenApi.Models;
 using MySqlConnector;
 using System.Data;
 using System.Text;
+using System.Text.Json.Serialization;
 
 try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.AddControllers();
+    builder.Services.AddControllers().AddJsonOptions(opts =>
+    {
+        opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        opts.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
     builder.Services.AddEndpointsApiExplorer();
 
     builder.Services.AddSwaggerGen(c =>
@@ -48,6 +53,7 @@ try
     {
         // 使用環境變數獲取連接字符串
         var connectionString = Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING");
+        Console.Write(connectionString);
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new InvalidOperationException("SQL_CONNECTION_STRING environment variable is not set.");

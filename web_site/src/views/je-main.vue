@@ -1,15 +1,18 @@
 <!-- je -->
 <template>
   <h1>傳票總覽</h1>
-  <p>
-    <button id="add" @click="editBtn_clicked">新增</button>
-    <button id="edit" :disabled="updateBtnDisable" @click="editBtn_clicked">
-      修改
-    </button>
-    <button id="void" :disabled="updateBtnDisable" @click="editBtn_clicked">
-      作廢
-    </button>
-  </p>
+  <div id="topTools">
+    <div>
+      <button id="add" @click="editBtn_clicked">新增</button>
+      <button id="edit" :disabled="updateBtnDisable" @click="editBtn_clicked">
+        修改
+      </button>
+      <button id="void" :disabled="updateBtnDisable" @click="editBtn_clicked">
+        作廢
+      </button>
+    </div>
+    <p ref="pagerElm"></p>
+  </div>
   <div ref="dtElm"></div>
 </template>
 
@@ -24,6 +27,7 @@ import valList from "@/config/text-value.js";
 const router = useRouter();
 const dtObj = ref(Tabulator);
 const dtElm = ref(null);
+const pagerElm = ref(null);
 let dtData = [];
 let updateBtnDisable = ref(true);
 let loading = false;
@@ -32,8 +36,8 @@ let selectedNo = ""; //被選中的傳票編號
 //重抓交易紀錄
 const reload_je = async () => {
   loading = true;
-  let response = await service.getVoucherList();
-  dtData.push(...response);
+  let response = await service.getVoucherList({});
+  dtObj.value.setData(response);
   loading = false;
 };
 
@@ -45,35 +49,29 @@ onMounted(async () => {
     selectableRows: 1, //只允許單行選擇
     reactiveData: true, //設定響應式資料
     columns: [
-      { title: "ID", field: "id", visible: false, sorter: "number" },
-      { title: "編號", field: "no", width: 100 },
+      { title: "編號", field: "no", width: 80 },
       {
-        title: "建立日期",
-        field: "createDate",
+        title: "交易日期",
+        field: "entry_date",
         width: 100,
-        sorter: "date",
-        sorterParams: {
-          format: "yyyy-MM-dd",
-          alignEmptyValues: "top",
-        },
       },
-      {
-        title: "金額",
-        field: "amount",
-        width: 100,
-        formatter: function (cell) {
-          const value = cell.getValue();
-          if (isNaN(value)) {
-            return value;
-          }
-          return new Intl.NumberFormat("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(value);
-        },
-        hozAlign: "right",
-      },
-      { title: "摘要", field: "remark" },
+      // {
+      //   title: "金額",
+      //   field: "amount",
+      //   width: 100,
+      //   formatter: function (cell) {
+      //     const value = cell.getValue();
+      //     if (isNaN(value)) {
+      //       return value;
+      //     }
+      //     return new Intl.NumberFormat("en-US", {
+      //       minimumFractionDigits: 2,
+      //       maximumFractionDigits: 2,
+      //     }).format(value);
+      //   },
+      //   hozAlign: "right",
+      // },
+      { title: "摘要", field: "summary", width: 500 },
       {
         title: "狀態",
         field: "status",
@@ -85,7 +83,7 @@ onMounted(async () => {
         },
       },
     ],
-    data: dtData, // 將假資料放入
+    data: dtData,
     placeholder: () => {
       if (loading) {
         return "資料載入中..."; // 顯示載入中訊息
@@ -95,6 +93,10 @@ onMounted(async () => {
         return ""; // 有資料時不顯示任何訊息
       }
     },
+    pagination: true,
+    paginationSize: 10,
+    paginationElement: pagerElm.value,
+    paginationAddRow: "table",
   });
 
   dtObj.value.on("rowClick", (e, row) => {
@@ -118,7 +120,7 @@ const editBtn_clicked = (e) => {
       router.push({ path: "je/edit" });
       break;
     case "edit":
-      router.push({ path: "je/edit", params: { no: selectedNo } });
+      router.push({ path: "je/edit", query: { no: selectedNo.no } });
       break;
     case "void":
       break;
@@ -126,4 +128,15 @@ const editBtn_clicked = (e) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+#topTools {
+  display: flex;
+  justify-content: space-between;
+}
+#topTools button {
+  font-size: 18px;
+}
+.tabulator-page {
+  font-size: 18px;
+}
+</style>

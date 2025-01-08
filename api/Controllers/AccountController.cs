@@ -29,8 +29,8 @@ namespace api.Controllers
             try
             {
                 string sql = @"SELECT id,no,name,type,description,active 
-                             FROM account
-                            WHERE main_id IS NULL";
+                                 FROM account
+                                WHERE main_id IS NULL";
 
                 var data = await _connection.QueryAsync<dynamic>(sql);
                 var json = JsonConvert.SerializeObject(data, Formatting.Indented);
