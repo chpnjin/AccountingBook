@@ -53,3 +53,5 @@
 /api/obj/Container/AbsoluteOutputAssemblyPath.cache
 /api/bin
 /api/obj
+/docker-compose.yml
+/api/Dockerfile
