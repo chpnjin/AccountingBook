@@ -4,7 +4,7 @@ export default [
   { text: "負債", value: "Liability" },
   { text: "權益", value: "Equity" },
   { text: "收入", value: "Revenue" },
-  { text: "費用", value: "Expense" },
+  { text: "支出", value: "Expense" },
   { text: '未審核', value: "unapproved" },
   { text: '審核中', value: "approving" },
   { text: '已審核', value: "approved" },

@@ -16,8 +16,8 @@ namespace api.Controllers
     /// 會計傳票資料操作
     /// </summary>
     [Route("api/[controller]")]
-    [AllowAnonymous]
     [ApiController]
+    [Authorize]
     public class VoucherController : ControllerBase
     {
         private readonly MySqlConnection conn;
@@ -132,7 +132,7 @@ namespace api.Controllers
         }
 
         /// <summary>
-        /// 取得新傳票編號
+        /// 編輯
         /// </summary>
         /// <returns></returns>
         [HttpPost("Edit")]

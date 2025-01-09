@@ -1,3 +1,4 @@
+<!-- 彈窗:編輯傳票選擇科目 -->
 <template>
   <div v-if="visible" class="dialog-overlay">
     <div class="dialog">
@@ -140,11 +141,8 @@ const handleFocus = () => {
   showMainList.value = true;
 };
 
-// 選擇選項，並關閉選單
+// 選擇選項，並關閉主科目下拉選單
 const selectMain = (item) => {
-  console.log("Selected ID:", item.id);
-  console.log("Selected TEXT:", item.text);
-
   selectedMainAcctName.value = item.text;
   showMainList.value = false; // 隱藏選單
   UpdateSubAcctList(item.id);
@@ -169,11 +167,13 @@ const UpdateSubAcctList = async (id) => {
 
 // 關閉對話框
 const closeDialog = () => {
+  selectedMainAcctName.value = "";
   emit("close"); // 觸發對話框關閉事件
 };
 
 //選擇科目傳回父組件
 const choiceAcct = () => {
+  selectedMainAcctName.value = "";
   emit("selected", selectedSubAcct);
 };
 </script>

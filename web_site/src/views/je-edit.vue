@@ -49,6 +49,8 @@ import editDialog from "@/components/Dialog_ChoiceAcct.vue"; //選擇科目彈�
 import "tabulator-tables/dist/css/tabulator.min.css";
 import { useRouter } from "vue-router";
 import service from "@/services/voucherService"; //API
+import { default as formatters } from '@/config/formatter.js'; // 導入格式化函式陣列
+const [moneyFormatter] = formatters;
 
 const router = new useRouter();
 const dtObj = ref(Tabulator);
@@ -68,7 +70,7 @@ let loading = false;
 let selectedRow;
 //單頭資料
 const master = reactive({
-  no: "",
+  no: "新增完成後自動編號",
   entry_date: "",
   voucher_type: "",
   summary: "",
@@ -158,18 +160,37 @@ onMounted(async () => {
 });
 
 //金額格式
-const moneyFormatter = (cell) => {
-  const value = cell.getValue();
-  if (isNaN(value)) {
-    return value;
+// const moneyFormatter = (cell) => {
+//   const value = cell.getValue();
+//   if (isNaN(value)) {
+//     return value;
+//   }
+//   return new Intl.NumberFormat("en-US", {
+//     minimumFractionDigits: 0,
+//     maximumFractionDigits: 2,
+//   }).format(value);
+// };
+//檢查填寫內容
+const checkForm = () => {
+  //單頭欄位檢查
+  if (master.voucher_type == "") {
+    alert("請選擇傳票類型");
+    return false;
   }
-  return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(value);
-};
-//檢查借貸平衡
-const checkBalance = () => {
+
+  if (master.entry_date == "") {
+    alert("請選擇交易日期");
+    return false;
+  }
+
+  if (master.summary == "") {
+    alert("請輸入摘要");
+    return false;
+  }
+
+  // 單身科目驗證
+  let data = dtObj.value.getData();
+
   // 取得底部計算的結果
   let calcResults = dtObj.value.getCalcResults();
 
@@ -177,13 +198,18 @@ const checkBalance = () => {
   let sumAmountD = calcResults.bottom["debit_amount"];
   let sumAmountC = calcResults.bottom["credit_amount"];
 
+  if(data.length < 2){
+    alert("科目至少要有兩個以上");
+    return false;
+  }
+
   if (sumAmountD == 0 && sumAmountC == 0) {
-    console.info("借貸金額不得同時為0");
+    alert("借貸金額不得同時為0");
     return false;
   }
 
   if (sumAmountD != sumAmountC) {
-    console.info("借貸未平衡，請再檢查輸入金額");
+    alert("借貸未平衡，請再檢查輸入金額");
     return false;
   }
 
@@ -219,6 +245,11 @@ const deleteAccount = () => {
 const packData = () => {
   let data = {};
   let items = dtObj.value.getData();
+
+  if(router.currentRoute.value.query.no == null){
+    master.no = "";
+  }
+
   data.master = toRaw(master);
   data.detail = items;
 
@@ -227,7 +258,7 @@ const packData = () => {
 
 //儲存
 const save = async () => {
-  if (checkBalance() == false) {
+  if (checkForm() == false) {
     return;
   }
 
@@ -244,7 +275,7 @@ const save = async () => {
 
 //送審
 const submit = () => {
-  if (checkBalance() == false) {
+  if (checkForm() == false) {
     return;
   }
 
@@ -312,12 +343,18 @@ const cancel = () => {
     margin-bottom: 5px;
   }
 }
+
 /* 工具列 */
 #topTools {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+#topTools button {
+  font-size: medium;
+  margin-right: 5px;
+}
+
 .btnBar {
   display: flex;
   justify-content: space-around;

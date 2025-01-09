@@ -2,6 +2,7 @@
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MySqlConnector;
 using Newtonsoft.Json;
 using System.Data;
 
@@ -9,20 +10,21 @@ namespace api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AccountController : ControllerBase
     {
-        private readonly IDbConnection _connection;
+        private readonly MySqlConnection conn;
 
         public AccountController(IDbConnection connection)
         {
-            _connection = connection;
+            conn = (MySqlConnection)connection;
+            conn.Open();
         }
 
         /// <summary>
         /// 取得所有主科目
         /// </summary>
         /// <returns></returns>
-        [Authorize]
         [HttpPost("GetMainAccounts")]
         public async Task<ActionResult> GetMainAccounts()
         {
@@ -32,7 +34,7 @@ namespace api.Controllers
                                  FROM account
                                 WHERE main_id IS NULL";
 
-                var data = await _connection.QueryAsync<dynamic>(sql);
+                var data = await conn.QueryAsync<dynamic>(sql);
                 var json = JsonConvert.SerializeObject(data, Formatting.Indented);
 
                 return Ok(json);
@@ -48,7 +50,6 @@ namespace api.Controllers
         /// </summary>
         /// <param name="mainId">主科目ID</param>
         /// <returns></returns>
-        [Authorize]
         [HttpPost("GetSubAccounts")]
         public async Task<ActionResult> GetSubAccounts([FromBody] GetSubAccountInput parms)
         {
@@ -59,7 +60,7 @@ namespace api.Controllers
                             WHERE main_id = @main_id "
                 ;
 
-                var data = await _connection.QueryAsync<dynamic>(sql, new { @main_id = parms.main_id });
+                var data = await conn.QueryAsync<dynamic>(sql, new { @main_id = parms.main_id });
                 var json = JsonConvert.SerializeObject(data, Formatting.Indented);
 
                 return Ok(json);
@@ -75,7 +76,6 @@ namespace api.Controllers
         /// </summary>
         /// <param name="accountNo"></param>
         /// <returns></returns>
-        [Authorize]
         [HttpGet("CheckAccountExist")]
         public async Task<ActionResult> CheckAccountExist(string accountNo)
         {
@@ -83,7 +83,7 @@ namespace api.Controllers
             {
                 string sql = @"SELECT COUNT(no) FROM account WHERE no = @accountNo";
 
-                var data = await _connection.QueryAsync<int>(sql, new { accountNo });
+                var data = await conn.QueryAsync<int>(sql, new { accountNo });
 
                 var result = data.FirstOrDefault() > 0 ? true : false;
 
@@ -100,23 +100,23 @@ namespace api.Controllers
         /// 編輯科目
         /// </summary>
         /// <returns></returns>
-        [Authorize]
         [HttpPost("Edit")]
         public async Task<ActionResult> EditAccount(Account parms)
         {
-            try
+            using (var tran = conn.BeginTransaction())
             {
-                string sqlStr = "";
+                try
+                {
+                    string sqlStr = "";
 
-                if (parms.id is null)
-                {
-                    sqlStr = @"INSERT INTO account (no, name, type, main_id, description)
-                    VALUES (@no, @name, @type, @main_id, @description)
-                    ";
-                }
-                else
-                {
-                    sqlStr = @"UPDATE account
+                    if (parms.id is null)
+                    {
+                        sqlStr = @"INSERT INTO account (no, name, type, main_id, description)
+                                               VALUES (@no, @name, @type, @main_id, @description)";
+                    }
+                    else
+                    {
+                        sqlStr = @"UPDATE account
                                   SET no = @no,
                                     name = @name,
                                    type = @type,
@@ -125,15 +125,25 @@ namespace api.Controllers
                                  active = TRUE,
                       last_updated_time = CURRENT_TIMESTAMP() 
                                WHERE id = @id";
+                    }
+
+                    await conn.ExecuteAsync(sqlStr, parms, tran);
+
+                    //若更新的是主科目，一併更新底下所有子科目的類型
+                    if (parms.main_id is null)
+                    {
+                        sqlStr = @"UPDATE account SET type = @type WHERE main_id = @id";
+                        await conn.ExecuteAsync(sqlStr, parms, tran);
+                    }
+
+                    await tran.CommitAsync();
+                    return Ok("Done");
                 }
-
-                await _connection.ExecuteAsync(sqlStr, parms);
-
-                return Ok("Done");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+                catch (Exception ex)
+                {
+                    await tran.RollbackAsync();
+                    return BadRequest(ex.Message);
+                }
             }
         }
     }

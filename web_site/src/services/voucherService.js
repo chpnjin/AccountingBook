@@ -6,14 +6,20 @@ export default {
   //取得傳票清單
   async getVoucherList(searchCondition) {
     let response = await axios.post("api/Voucher/List", searchCondition);
+    let data;
 
     if (response.statusText == "OK") {
-      return response.data;
+      data = response.data;
+
+      data.forEach(item => {
+        item.entry_date = item.entry_date.split('T')[0];
+      });
+
+      return data;
     } else {
       return [];
     }
-  },
-  //取得交易明細
+  },//取得交易明細
   async getVoucherDetail(no) {
     let result = await axios.get(`api/Voucher/GetDetail?no=${no}`);
 
@@ -26,8 +32,7 @@ export default {
       console.error(result.statusText);
       return null;
     }
-  },
-  //編輯傳票
+  },//編輯傳票
   async editVoucher(data) {
     let result;
     //新增|編輯寫入

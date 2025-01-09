@@ -1,6 +1,7 @@
 <template>
   <div class="main-layout">
     <header class="header">
+      <router-link to="/" class="home-button">首頁</router-link> <div class="user-info"></div>
       <div class="user-info">
         <span>登入者 : {{ username }}</span>
         <button @click="logout">登出</button>
@@ -8,7 +9,7 @@
     </header>
     <div class="layout">
       <!-- 側邊欄 -->
-      <SidebarNav />
+      <SidebarNav class="sidebar" />
 
       <!-- 內容區域 -->
       <main class="content">
@@ -56,9 +57,21 @@ export default {
   background: #2c3e50;
   color: #fff;
   padding: 10px 20px; /* 增加內邊距 */
-  justify-content: flex-end; /* 將內容推到右邊 */
+  justify-content: space-between; /* 將內容推到右邊 */
   align-items: end; /* 垂直居中 */
   box-sizing: border-box;
+}
+
+.home-button {
+  background: #3498db; /* 或其他你喜歡的顏色 */
+  border: none;
+  color: #fff;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  text-decoration: none; /* 移除連結底線 */
+  margin-right: 10px;
+  font-size: 18px;
 }
 
 .user-info {
@@ -68,7 +81,7 @@ export default {
 }
 
 .user-info span {
-  font-size: 14px; /* 調整字體大小 */
+  font-size: 20px; /* 調整字體大小 */
 }
 
 button {
@@ -76,9 +89,9 @@ button {
   border: none;
   color: #fff;
   padding: 5px 10px;
-  font-size: 14px;
   cursor: pointer;
   border-radius: 4px; /* 圓角按鈕 */
+  font-size: 18px;
 }
 
 .layout {
@@ -89,7 +102,7 @@ button {
 }
 
 .sidebar {
-  width: 250px;
+  width: 200px;
   background: #34495e;
   color: #ecf0f1;
   padding: 0;

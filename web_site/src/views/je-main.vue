@@ -1,8 +1,7 @@
 <!-- je -->
 <template>
-  <h1>傳票總覽</h1>
   <div id="topTools">
-    <div>
+    <div class="button-container">
       <button id="add" @click="editBtn_clicked">新增</button>
       <button id="edit" :disabled="updateBtnDisable" @click="editBtn_clicked">
         修改
@@ -28,7 +27,7 @@ const router = useRouter();
 const dtObj = ref(Tabulator);
 const dtElm = ref(null);
 const pagerElm = ref(null);
-let dtData = [];
+let dtData = reactive([]);
 let updateBtnDisable = ref(true);
 let loading = false;
 let selectedNo = ""; //被選中的傳票編號
@@ -132,11 +131,43 @@ const editBtn_clicked = (e) => {
 #topTools {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 10px; /*按鈕間距*/
+  padding: 2px 2px 10px 2px; /* 容器內距 */
 }
-#topTools button {
+
+.button-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px; /*按鈕間距*/
+  padding: 2px 2px 10px 2px; /* 容器內距 */
+}
+
+.button-container button {
+  padding: 5px 20px;
+  border: none; /* 移除預設邊框 */
+  border-radius: 5px;
+  background-color: #4caf50; /* 設定背景顏色 */
+  color: white; /* 設定文字顏色 */
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* 加入過渡效果 */
   font-size: 18px;
 }
-.tabulator-page {
-  font-size: 18px;
+/* 滑鼠懸停時改變背景顏色 */
+.button-container button:hover {
+  background-color: #45a049;
 }
+ /* 只有在未 disabled 時才套用 hover 效果 */
+.button-container button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+/* 無效按鈕 */
+.button-container button:disabled {
+  background-color: #cccccc; /* disabled 時的背景顏色 (灰色) */
+  color: #666666; /* disabled 時的文字顏色 (深灰色) */
+  cursor: default; /* disabled 時的滑鼠游標 */
+  opacity: 0.6; /* 降低透明度，更明顯區分 */
+}
+
 </style>
