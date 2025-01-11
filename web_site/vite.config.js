@@ -1,18 +1,21 @@
 ﻿import { fileURLToPath, URL } from 'node:url'
-
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+export default defineConfig(() => { // defineConfig 接受函式
+  return {
+    base: "/", //指定部署後的基路徑
+    plugins: [ //插件
+      vue(),
+      // vueDevTools(),
+    ],
+    resolve: {
+      alias: {
+        //縮寫
+        '@': fileURLToPath(new URL('./src', import.meta.url))
+      },
     },
-  },
-})
+    //指定環境變數所在路徑
+    envDir: fileURLToPath(new URL('./env', import.meta.url)),
+  };
+});

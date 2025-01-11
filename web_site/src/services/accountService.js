@@ -6,7 +6,7 @@ export default {
     let response;
 
     try {
-      response = await axios.post("api/Account/GetMainAccounts");
+      response = await axios.post("Account/GetMainAccounts");
       return response.data;
     } catch (error) {
       console.info(error);
@@ -21,7 +21,7 @@ export default {
     }
 
     try {
-      response = await axios.post("api/Account/GetSubAccounts", parms);
+      response = await axios.post("Account/GetSubAccounts", parms);
       return response.data;
     } catch (error) {
       return [];
@@ -32,7 +32,7 @@ export default {
     let response;
 
     try {
-      response = await axios.get(`api/Account/CheckAccountExist?accountNo=${accountNo}`).then((result)=>{
+      response = await axios.get(`Account/CheckAccountExist?accountNo=${accountNo}`).then((result)=>{
         return result.data;
       });
 
@@ -50,7 +50,7 @@ export default {
     parms.main_id = null;
 
     try {
-      response = await axios.post("api/Account/Edit", parms);
+      response = await axios.post("Account/Edit", parms);
       return response.data;
     } catch (error) {
       console.info(error);
@@ -62,7 +62,7 @@ export default {
     let response;
 
     try {
-      response = await axios.post("api/Account/Edit", parms);
+      response = await axios.post("Account/Edit", parms);
       return response.data;
     } catch (error) {
       console.info(error);

@@ -8,7 +8,7 @@
     </form>
     <p style="height: 20px"></p>
     <!-- 新增測試按鈕 -->
-    <!-- <button @click="callApiTest">測試API</button> -->
+    <button @click="test">單元測試按鈕</button>
     <span id="msg">{{ message }}</span>
   </div>
 </template>
@@ -64,12 +64,9 @@ export default {
         this.message = "登錄失敗，請稍後重試(" + error + ")";
       }
     },
-    async callApiTest() {
-      try {
-        let result = await UserService.callApiTest();
-      } catch (error) {
-        console.error("API測試失敗:", error);
-      }
+    //單元測試按鈕
+    async test() {
+      console.log(import.meta.env);
     },
   },
 };

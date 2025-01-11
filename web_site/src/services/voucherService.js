@@ -5,7 +5,7 @@ const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 export default {
   //取得傳票清單
   async getVoucherList(searchCondition) {
-    let response = await axios.post("api/Voucher/List", searchCondition);
+    let response = await axios.post("Voucher/List", searchCondition);
     let data;
 
     if (response.statusText == "OK") {
@@ -21,7 +21,7 @@ export default {
     }
   },//取得交易明細
   async getVoucherDetail(no) {
-    let result = await axios.get(`api/Voucher/GetDetail?no=${no}`);
+    let result = await axios.get(`Voucher/GetDetail?no=${no}`);
 
     if (result.data.master && result.data.detail) {
       //日期轉換
@@ -36,7 +36,7 @@ export default {
   async editVoucher(data) {
     let result;
     //新增|編輯寫入
-    result = await axios.post("api/Voucher/Edit", data);
+    result = await axios.post("Voucher/Edit", data);
 
     return result.data;
   }

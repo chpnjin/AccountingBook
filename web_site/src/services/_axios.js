@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:5062/", //設定API位置
+  // baseURL: "http://localhost:5062/api/", //設定API位置
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: 50000, //等待Server回應時限
 });
 
@@ -9,7 +10,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     //非登入驗證均需在請求標頭帶入JWT
-    if (config.url != "api/User/LoginVerification") {
+    if (config.url != "User/LoginVerification") {
       const token = localStorage.getItem("token");
       if (token) {
         config.headers["Authorization"] = `Bearer ${token}`;

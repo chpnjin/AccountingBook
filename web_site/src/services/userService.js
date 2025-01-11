@@ -3,7 +3,7 @@
 export default {
   //API呼叫測試
   async callApiTest() {
-    let result = await axios.get('api/Test/NoNeedAuthorizeTest').then((response) => {
+    let result = await axios.get('Test/NoNeedAuthorizeTest').then((response) => {
       return response;
     }).catch((error) => {
       return error;
@@ -16,7 +16,7 @@ export default {
 
   //使用者認證
   async loginVerification(parm) {
-    let response = await axios.post('api/User/LoginVerification', parm).then((axios) => {
+    let response = await axios.post('User/LoginVerification', parm).then((axios) => {
       return {
         "token": axios.data.token,
         "id" : axios.data.id,
@@ -33,7 +33,7 @@ export default {
   //創建使用者
   async createUser(userData) {
     try {
-      const response = await axios.post('api/User/Insert', userData);
+      const response = await axios.post('User/Insert', userData);
 
       return response.data;
     } catch (error) {
