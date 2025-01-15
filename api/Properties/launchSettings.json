@@ -6,7 +6,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "SQL_CONNECTION_STRING": "Server=175.182.6.36,1500;Database=accounting;User=jim;Password=Syno[0912]logy",
+        "SQL_CONNECTION_STRING": "{SQL_CONNECTION_STRING}",
         "Jwt:Key": "your-very-very-secret-and-long-key-for-256-bits",
         "Jwt:Issuer": "YourIssuer",
         "Jwt:Audience": "YourAudience"
