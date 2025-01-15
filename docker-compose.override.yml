@@ -8,16 +8,16 @@
       - ASPNETCORE_HTTP_PORTS=8080
       # - ASPNETCORE_HTTPS_PORTS=8081
     ports:
-      - "5001:8080"
+      - "300:8080"
       # - "301:8081"
-    volumes:
+    #volumes:
     #   - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    #   - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
   web_site:
       build:
         context: ./web_site  # Vue.js專案在 web_site 目錄下
         dockerfile: Dockerfile
       ports:
-        - "5000:80" #容器內80對外200
+        - "200:80" #容器內80對外200
       depends_on:
         - api

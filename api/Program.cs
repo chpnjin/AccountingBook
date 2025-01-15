@@ -105,7 +105,7 @@ try
 
     if (settings == null)
     {
-        allowedOrigins.AddRange(["http://localhost:5173/", "http://chpngen920.synology.me:5005"]);
+        allowedOrigins.AddRange(["http://localhost:5173", "http://chpngen920.synology.me:5005"]);
     }
     else
     {

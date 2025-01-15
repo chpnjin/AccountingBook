@@ -11,8 +11,10 @@
     <button @click="test">單元測試按鈕</button>
     <span id="msg">{{ message }}</span>
   </div>
-  <div class="version-info">
-    <span>建置日期:{{ buildDate }}| API路徑:{{ apiUrl }} | 連線資料庫:{{ dbTarget }}</span>
+  <div class="system-info">
+    <span>建置日期：{{ buildDate }}</span>
+    <span>API路徑：{{ apiUrl }}</span>
+    <span>連線資料庫：{{ dbTarget }}</span>
   </div>
 </template>
 
@@ -25,11 +27,12 @@ export default {
       id: "",
       password: "",
       message: "",
-      buildDate: import.meta.env.VITE_BUILD_DATE || '建置日期未設定', // 提供預設值
-      apiUrl: import.meta.env.VITE_API_URL || '未設定', //
-      dbTarget: '取得中...'
+      buildDate: import.meta.env.VITE_BUILD_DATE || "建置日期未設定", // 提供預設值
+      apiUrl: import.meta.env.VITE_API_URL || "未設定", //
+      dbTarget: "取得中...",
     };
-  },async mounted() {
+  },
+  async mounted() {
     this.dbTarget = await this.GetDbInfo();
   },
   methods: {
@@ -76,9 +79,9 @@ export default {
     async test() {
       console.log(import.meta.env);
     },
-    GetDbInfo(){
+    GetDbInfo() {
       return UserService.getServerInfo();
-    }
+    },
   },
 };
 </script>
@@ -130,7 +133,9 @@ msg {
 }
 
 /* 版本資訊樣式 */
-.version-info {
+.system-info {
+  display: flex;
+  flex-flow: column;
   position: fixed; /* 固定在底部 */
   bottom: 0;
   left: 0;

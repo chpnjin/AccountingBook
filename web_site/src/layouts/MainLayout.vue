@@ -16,7 +16,7 @@
       <SidebarNav class="sidebar" v-show="showSidebar" />
 
       <!-- 內容區域 -->
-      <main class="content">
+      <main class="content" @click="hideSidebar">
         <router-view />
       </main>
     </div>
@@ -44,7 +44,21 @@ export default {
     },
     //切換隱藏／顯示側邊欄
     toggleSidebar() {
-      this.showSidebar = !this.showSidebar; // Toggle visibility
+      this.showSidebar = !this.showSidebar;
+      // 取得sidebar元素
+      const sidebar = document.querySelector(".sidebar");
+      if (this.showSidebar) {
+        sidebar.classList.add("show");
+      } else {
+        sidebar.classList.remove("show");
+      }
+    },
+    hideSidebar() {
+      this.showSidebar = false;
+      const sidebar = document.querySelector(".sidebar");
+      if (sidebar && sidebar.classList.contains("show")) {
+        sidebar.classList.remove("show");
+      }
     },
   },
 };
@@ -59,6 +73,7 @@ export default {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  position: relative; /* 重要的：設定相對定位，作為 sidebar 的定位參考點 */
 }
 
 .header {
@@ -69,6 +84,7 @@ export default {
   justify-content: space-between; /* 將內容推到右邊 */
   align-items: end; /* 垂直居中 */
   box-sizing: border-box;
+  height: 60px; /* 假設 header 的高度為 60px */
 }
 
 .icon-menu {
@@ -117,13 +133,23 @@ button {
 }
 
 .sidebar {
+  position: absolute; /* 或 position: fixed; */
+  top: 60px; /* 設定 top 值為 header 的高度 */
+  left: 0;
+  height: calc(100% - 60px); /* 高度扣除 header 的高度 */
   width: 200px;
   background: #34495e;
   color: #ecf0f1;
   padding: 0;
   box-sizing: border-box;
   overflow-y: auto;
-  height: 100%;
+  z-index: 10; /* 確保 sidebar 在最上層 */
+  transition: transform 0.3s ease-in-out; /* 加入動畫效果 */
+  transform: translateX(-100%); /* 預設隱藏在左側 */
+}
+
+.sidebar.show {
+  transform: translateX(0); /* 顯示時移回原位 */
 }
 
 .content {

@@ -58,3 +58,5 @@
 /api/Dockerfile
 /api/appsettings.json
 /web_site/env/.env
+/web_site/env/.env.development
+/launchSettings.json
