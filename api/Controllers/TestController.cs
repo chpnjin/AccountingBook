@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MySqlConnector;
 using System.Data;
 using System.Xml.Linq;
 
@@ -52,7 +53,7 @@ namespace api.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        [Route("NoNeedAuthorizeTest")]
+        [Route("GetServerInfo")]
         public async Task<ActionResult<string>> NoNeedAuthorizeTest()
         {
 
@@ -62,8 +63,10 @@ namespace api.Controllers
 
                 _connection.Open();
                 var test = await _connection.QuerySingleOrDefaultAsync<string>(sql);
+                var builder = new MySqlConnectionStringBuilder(_connection.ConnectionString);
+                string server = builder.Server;
 
-                return "TEST OK";
+                return Ok(builder.Server);
             }
             catch (Exception ex)
             {

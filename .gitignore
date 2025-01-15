@@ -55,3 +55,6 @@
 /api/obj
 /docker-compose.yml
 /api/Dockerfile
+/api/Dockerfile
+/api/appsettings.json
+/web_site/env/.env

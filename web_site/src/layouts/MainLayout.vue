@@ -1,7 +1,11 @@
 <template>
   <div class="main-layout">
     <header class="header">
-      <router-link to="/" class="home-button">首頁</router-link> <div class="user-info"></div>
+      <div>
+        <img src="@/assets/menu.svg" class="icon-menu" @click="toggleSidebar" />
+        <router-link to="/" class="home-button">首頁</router-link>
+        <div class="user-info"></div>
+      </div>
       <div class="user-info">
         <span>登入者 : {{ username }}</span>
         <button @click="logout">登出</button>
@@ -9,7 +13,7 @@
     </header>
     <div class="layout">
       <!-- 側邊欄 -->
-      <SidebarNav class="sidebar" />
+      <SidebarNav class="sidebar" v-show="showSidebar" />
 
       <!-- 內容區域 -->
       <main class="content">
@@ -30,12 +34,17 @@ export default {
   data() {
     return {
       username: localStorage.getItem("name") || "未知用戶",
+      showSidebar: false,
     };
   },
   methods: {
     logout() {
       localStorage.clear();
       this.$router.push("/login");
+    },
+    //切換隱藏／顯示側邊欄
+    toggleSidebar() {
+      this.showSidebar = !this.showSidebar; // Toggle visibility
     },
   },
 };
@@ -60,6 +69,12 @@ export default {
   justify-content: space-between; /* 將內容推到右邊 */
   align-items: end; /* 垂直居中 */
   box-sizing: border-box;
+}
+
+.icon-menu {
+  width: 30px;
+  background: #fff;
+  margin-right: 10px;
 }
 
 .home-button {

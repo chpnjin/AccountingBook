@@ -1,5 +1,13 @@
 <!-- je -->
 <template>
+  <div class="border">
+    <span class="borderTitle">篩選</span>
+    <label>日期區間 : </label>
+    <input type="date" v-model="filterCondition.dateStart" />～<input
+      type="date"
+      v-model="filterCondition.dateEnd"
+    />
+  </div>
   <div id="topTools">
     <div class="button-container">
       <button id="add" @click="editBtn_clicked">新增</button>
@@ -27,54 +35,53 @@ const router = useRouter();
 const dtObj = ref(Tabulator);
 const dtElm = ref(null);
 const pagerElm = ref(null);
+
 let dtData = reactive([]);
 let updateBtnDisable = ref(true);
 let loading = false;
 let selectedNo = ""; //被選中的傳票編號
+let filterCondition = reactive({
+  dateStart: "",
+  dateEnd: "",
+});
 
 //重抓交易紀錄
 const reload_je = async () => {
   loading = true;
-  let response = await service.getVoucherList({});
+  let response = await service.getVoucherList(filterCondition);
   dtObj.value.setData(response);
   loading = false;
+};
+//初始化篩選條件
+const initFilterCondition = () => {
+  let today = new Date();
+  let year = today.getFullYear();
+  let month = String(today.getMonth() + 1).padStart(2, "0");
+  let day = String(today.getDate()).padStart(2, "0");
+
+  filterCondition.dateEnd = `${year}-${month}-${day}`;
+  filterCondition.dateStart = `${year}-${month}-01`; // 更簡潔的設定當月第一天
 };
 
 //初次讀取
 onMounted(async () => {
   dtObj.value = new Tabulator(dtElm.value, {
     layout: "fitColumns",
-    height: "400px",
+    height: "420px",
     selectableRows: 1, //只允許單行選擇
     reactiveData: true, //設定響應式資料
     columns: [
-      { title: "編號", field: "no", width: 80 },
+      { title: "編號", field: "no", width: 100 },
       {
         title: "交易日期",
         field: "entry_date",
-        width: 100,
+        width: 110,
       },
-      // {
-      //   title: "金額",
-      //   field: "amount",
-      //   width: 100,
-      //   formatter: function (cell) {
-      //     const value = cell.getValue();
-      //     if (isNaN(value)) {
-      //       return value;
-      //     }
-      //     return new Intl.NumberFormat("en-US", {
-      //       minimumFractionDigits: 2,
-      //       maximumFractionDigits: 2,
-      //     }).format(value);
-      //   },
-      //   hozAlign: "right",
-      // },
-      { title: "摘要", field: "summary", width: 500 },
+      { title: "摘要", field: "summary", width: 550 },
       {
         title: "狀態",
         field: "status",
-        width: 100,
+        width: 70,
         formatter: (cell) => {
           const value = cell.getValue();
           const foundType = valList.find((x) => x.value === value);
@@ -107,7 +114,10 @@ onMounted(async () => {
 
   //初次載入時抓取資料
   await nextTick();
-  await reload_je();
+
+  reload_je().then(() => {
+    initFilterCondition();
+  });
 });
 
 //按下編輯按鈕
@@ -128,6 +138,32 @@ const editBtn_clicked = (e) => {
 </script>
 
 <style scoped>
+.border {
+  border: 1px solid #ccc;
+  padding: 20px;
+  position: relative; /* 關鍵：設定相對定位 */
+  width: 100%;
+  height: 100px;
+  box-sizing: border-box; /* 確保 padding 和 border 不會影響寬度 */
+  margin-bottom: 10px;
+}
+/* 外框標題 */
+.borderTitle {
+  position: absolute; /* 關鍵：設定絕對定位 */
+  top: -10px; /* 向上移動，使其超出外框 */
+  left: 10px; /* 從左邊開始 */
+  /* 讓標題底色與背景相同，遮蓋外框線 */
+  background-color: white;
+  padding: 0 5px; /* 增加左右內距，使文字周圍有空間 */
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.border label,
+input {
+  font-size: 18px;
+}
+
 #topTools {
   display: flex;
   justify-content: space-between;
@@ -158,7 +194,7 @@ const editBtn_clicked = (e) => {
 .button-container button:hover {
   background-color: #45a049;
 }
- /* 只有在未 disabled 時才套用 hover 效果 */
+/* 只有在未 disabled 時才套用 hover 效果 */
 .button-container button:hover:not(:disabled) {
   background-color: #45a049;
 }
@@ -170,4 +206,7 @@ const editBtn_clicked = (e) => {
   opacity: 0.6; /* 降低透明度，更明顯區分 */
 }
 
+.tabulator {
+  font-size: 18px;
+}
 </style>

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MySqlConnector;
+using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -99,19 +100,23 @@ try
         app.UseSwaggerUI();
     }
 
-    var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+    var settings = builder.Configuration["ALLOWED_ORIGINS"];
+    var allowedOrigins = new List<string>();
 
-    if (allowedOrigins == null)
+    if (settings == null)
     {
-        allowedOrigins = new string[] { "" };
+        allowedOrigins.AddRange(["http://localhost:5173/", "http://chpngen920.synology.me:5005"]);
+    }
+    else
+    {
+        allowedOrigins.AddRange(settings.Split(','));
     }
 
     app.UseCors(builder => builder
-    .WithOrigins(allowedOrigins)
-    .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")     // Allow all ports on localhost
-    .AllowAnyMethod()                     // 允許任何方法
-    .AllowAnyHeader()                     // 允許任何標頭
-    .AllowCredentials());                 // 如果需要傳送 cookie 或認證信息
+    .WithOrigins(allowedOrigins.ToArray())
+    .AllowAnyMethod()
+    .WithHeaders("Content-Type", "Authorization", "Accept")
+    .AllowCredentials()); // 如果需要傳送 cookie 或認證信息
 
     app.UseRouting();
 

@@ -2,8 +2,8 @@
 
 export default {
   //API呼叫測試
-  async callApiTest() {
-    let result = await axios.get('Test/NoNeedAuthorizeTest').then((response) => {
+  async getServerInfo() {
+    let result = await axios.get('Test/GetServerInfo').then((response) => {
       return response;
     }).catch((error) => {
       return error;
@@ -11,7 +11,7 @@ export default {
       return obj;
     });
 
-    return result;
+    return result.status == 200 ? result.data : result.statusText;
   },
 
   //使用者認證

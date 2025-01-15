@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, defineProps, defineEmits } from "vue";
+import { ref, watch, nextTick} from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import "tabulator-tables/dist/css/tabulator.min.css";
 import service from "@/services/accountService"; //API

@@ -11,6 +11,9 @@
     <button @click="test">單元測試按鈕</button>
     <span id="msg">{{ message }}</span>
   </div>
+  <div class="version-info">
+    <span>建置日期:{{ buildDate }}| API路徑:{{ apiUrl }} | 連線資料庫:{{ dbTarget }}</span>
+  </div>
 </template>
 
 <script>
@@ -22,7 +25,12 @@ export default {
       id: "",
       password: "",
       message: "",
+      buildDate: import.meta.env.VITE_BUILD_DATE || '建置日期未設定', // 提供預設值
+      apiUrl: import.meta.env.VITE_API_URL || '未設定', //
+      dbTarget: '取得中...'
     };
+  },async mounted() {
+    this.dbTarget = await this.GetDbInfo();
   },
   methods: {
     async btnLogin_click() {
@@ -68,6 +76,9 @@ export default {
     async test() {
       console.log(import.meta.env);
     },
+    GetDbInfo(){
+      return UserService.getServerInfo();
+    }
   },
 };
 </script>
@@ -116,5 +127,17 @@ button:hover {
 
 msg {
   color: aqua;
+}
+
+/* 版本資訊樣式 */
+.version-info {
+  position: fixed; /* 固定在底部 */
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #333; /* 或其他你喜歡的顏色 */
+  color: #eee;
+  text-align: center;
+  padding: 10px 0;
 }
 </style>

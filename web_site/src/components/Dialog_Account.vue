@@ -56,16 +56,12 @@
 ref         :用來創建一個響應式引用資料型態
 reactive    :處裡Proxy 物件
 watch       :用來監聽響應式數據的變化，並在變化發生時執行相應的副作用函數
-defineProps :用於定義從父組件傳入子組件的屬性
-defineEmits :用來定義組件可以發射的事件，這些事件可以被父組件監聽和處理
 onMounted   :組件初次載入時觸發
 */
 import {
   ref,
   reactive,
   watch,
-  defineProps,
-  defineEmits,
   onMounted,
   toRaw,
 } from "vue";
