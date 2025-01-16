@@ -29,8 +29,7 @@ import { ref, reactive, onMounted, nextTick } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import "tabulator-tables/dist/css/tabulator_simple.min.css"; // 引入tabulator主題
 import service from "@/services/reportService";
-import { default as formatters } from "@/config/formatter.js"; // 導入格式化函式陣列
-const [moneyFormatter] = formatters;
+import formatters from "@/config/formatter.js"; // 導入格式化函式陣列
 import options from "@/config/text-value";
 
 //綁定元素
@@ -60,7 +59,7 @@ let tbSettings = {
     {
       title: "餘額",
       field: "balance",
-      formatter: moneyFormatter,
+      formatter: formatters.moneyFormatter,
       hozAlign: "right",
     },
   ],

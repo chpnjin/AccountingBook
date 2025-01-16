@@ -49,8 +49,7 @@ import editDialog from "@/components/Dialog_ChoiceAcct.vue"; //選擇科目彈�
 import "tabulator-tables/dist/css/tabulator.min.css";
 import { useRouter } from "vue-router";
 import service from "@/services/voucherService"; //API
-import { default as formatters } from '@/config/formatter.js'; // 導入格式化函式陣列
-const [moneyFormatter] = formatters;
+import formatters from "@/config/formatter.js"; // 導入格式化函式陣列
 
 const router = new useRouter();
 const dtObj = ref(Tabulator);
@@ -107,8 +106,8 @@ onMounted(async () => {
             editor: "input",
             width: 100,
             bottomCalc: "sum", // 底部顯示總和
-            bottomCalcFormatter: moneyFormatter, // 格式化為金額
-            formatter: moneyFormatter,
+            bottomCalcFormatter: formatters.moneyFormatter, // 格式化為金額
+            formatter: formatters.moneyFormatter,
             hozAlign: "right",
           },
           {
@@ -117,8 +116,8 @@ onMounted(async () => {
             editor: "input",
             width: 100,
             bottomCalc: "sum", // 底部顯示總和
-            bottomCalcFormatter: moneyFormatter, // 格式化為金額
-            formatter: moneyFormatter,
+            bottomCalcFormatter: formatters.moneyFormatter, // 格式化為金額
+            formatter: formatters.moneyFormatter,
             hozAlign: "right",
           },
         ],
@@ -132,7 +131,7 @@ onMounted(async () => {
             return ""; // 有資料時不顯示任何訊息
           }
         },
-        pagination: true,
+        // pagination: true,
         paginationSize: 10,
         paginationElement: pagerElm.value,
         paginationAddRow: "table",
@@ -308,9 +307,13 @@ const cancel = () => {
 }
 .item input,
 .item select {
-  width: 50px;
+  width: 100%;
   font-size: 18px;
   flex: 1;
+}
+
+.item input[type="date"]{
+  width: 130px;
 }
 
 .summary {

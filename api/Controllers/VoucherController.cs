@@ -1,14 +1,10 @@
 ﻿using api.Models;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.ObjectPool;
+using Microsoft.IdentityModel.Tokens;
 using MySqlConnector;
-using System;
 using System.Data;
-using System.Data.Common;
-using System.Text;
 
 namespace api.Controllers
 {
@@ -66,12 +62,50 @@ namespace api.Controllers
         [HttpPost("List")]
         public async Task<ActionResult> List(SearchCondition condition)
         {
+            DynamicParameters parms = new DynamicParameters();
+
             try
             {
-                string sql = @"SELECT no,entry_date,summary,handler,reviewer,status FROM voucher ";
+                string sql = @"SELECT no,entry_date,summary,handler,reviewer,status FROM voucher a ";
+                string conditions = "";
+
+                if (condition.date_start != null)
+                {
+                    conditions += "WHERE entry_date >= @date_start ";
+                    parms.Add("@date_start", condition.date_start);
+                }
+
+                if (condition.date_end != null)
+                {
+                    conditions += condition.date_start.IsNullOrEmpty() ? "WHERE " : "AND ";
+                    conditions += "entry_date <= @date_end ";
+                    parms.Add("@date_end", condition.date_end);
+                }
+
+                if(condition.summary != null)
+                {
+                    conditions += condition.date_end.IsNullOrEmpty() ? "WHERE " : "AND ";
+                    conditions += "summary LIKE @summary ";
+                    parms.Add("@summary", "%" + condition.summary + "%");
+                }
+
+                if(condition.account_list.Where(x=> x > 0).Any())
+                {
+                    conditions += condition.summary.IsNullOrEmpty() ? "WHERE " : "AND ";
+                    conditions += "b.account_id IN (@account_list)";
+                    parms.Add("@account_id", string.Join(",", condition.account_list));
+                }
+
+                sql += conditions;
+
+                if(condition.account_list.Where(x => x > 0).Any())
+                {
+                    conditions += "INNER JOIN voucher_detail b ON a.no = b.no ";
+                }
+
                 sql += "ORDER BY create_time DESC";
 
-                var data = await conn.QueryAsync<Voucher>(sql);
+                var data = await conn.QueryAsync<Voucher>(sql, parms);
 
                 if(data == null)
                 {

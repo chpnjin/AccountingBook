@@ -91,6 +91,7 @@ export default {
   width: 30px;
   background: #fff;
   margin-right: 10px;
+  background-color: transparent;
 }
 
 .home-button {

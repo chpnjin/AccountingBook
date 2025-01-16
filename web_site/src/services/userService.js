@@ -3,15 +3,12 @@
 export default {
   //API呼叫測試
   async getServerInfo() {
-    let result = await axios.get('Test/GetServerInfo').then((response) => {
-      return response;
-    }).catch((error) => {
-      return error;
-    }).finally((obj) => {
-      return obj;
-    });
-
-    return result.status == 200 ? result.data : result.statusText;
+    try {
+      const response = await axios.get('Test/GetServerInfo');
+      return response.status === 200 ? response.data : `API 請求失敗，狀態碼: ${response.status} ${response.statusText}`;
+    } catch (error) {
+      return `API 請求失敗，請確認API Server狀態(${error.message})`;
+    }
   },
 
   //使用者認證

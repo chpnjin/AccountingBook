@@ -64,9 +64,9 @@ namespace api.Models
     /// </summary>
     public class SearchCondition
     {
-        public string? no { get; set; }
-        public string? entry_date { get; set; }
+        public string? date_start { get; set; }
+        public string? date_end { get; set; }
         public string? summary { get; set; }
-        public string? status { get; set; }
+        public int[]? account_list { get; set; }
     }
 }

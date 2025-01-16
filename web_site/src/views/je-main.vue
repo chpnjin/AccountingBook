@@ -2,14 +2,27 @@
 <template>
   <div class="border">
     <span class="borderTitle">篩選</span>
-    <label>日期區間 : </label>
-    <input type="date" v-model="filterCondition.dateStart" />～<input
-      type="date"
-      v-model="filterCondition.dateEnd"
-    />
+    <div class="filter-item">
+      <label>日期</label>
+      <input type="date" v-model="filterCondition.date_start" />～<input
+        type="date"
+        v-model="filterCondition.date_end"
+      />
+    </div>
+    <div class="filter-item">
+      <label>摘要</label>
+      <input type="text" v-model="filterCondition.summary" />
+    </div>
+    <div class="filter-item">
+      <!-- <label>包含科目 : </label> -->
+    </div>
+    <div class="container-filter-btns">
+      <button @click="reload_je">查詢</button>
+      <button @click="clearCondition">清除條件</button>
+    </div>
   </div>
   <div id="topTools">
-    <div class="button-container">
+    <div class="container-action-btns">
       <button id="add" @click="editBtn_clicked">新增</button>
       <button id="edit" :disabled="updateBtnDisable" @click="editBtn_clicked">
         修改
@@ -24,12 +37,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from "vue";
+import { ref, reactive, toRaw, onMounted, nextTick } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import { useRouter } from "vue-router";
 import service from "@/services/voucherService"; //API呼叫服務
 import "tabulator-tables/dist/css/tabulator.min.css";
 import valList from "@/config/text-value.js";
+import formatter from "@/config/formatter.js";
 
 const router = useRouter();
 const dtObj = ref(Tabulator);
@@ -41,14 +55,13 @@ let updateBtnDisable = ref(true);
 let loading = false;
 let selectedNo = ""; //被選中的傳票編號
 let filterCondition = reactive({
-  dateStart: "",
-  dateEnd: "",
+  account_list: [],
 });
 
 //重抓交易紀錄
 const reload_je = async () => {
   loading = true;
-  let response = await service.getVoucherList(filterCondition);
+  let response = await service.getVoucherList(toRaw(filterCondition));
   dtObj.value.setData(response);
   loading = false;
 };
@@ -59,8 +72,8 @@ const initFilterCondition = () => {
   let month = String(today.getMonth() + 1).padStart(2, "0");
   let day = String(today.getDate()).padStart(2, "0");
 
-  filterCondition.dateEnd = `${year}-${month}-${day}`;
-  filterCondition.dateStart = `${year}-${month}-01`; // 更簡潔的設定當月第一天
+  filterCondition.date_start = `${year}-${month}-01`; // 更簡潔的設定當月第一天
+  filterCondition.date_end = `${year}-${month}-${day}`;
 };
 
 //初次讀取
@@ -70,6 +83,8 @@ onMounted(async () => {
     height: "420px",
     selectableRows: 1, //只允許單行選擇
     reactiveData: true, //設定響應式資料
+    locale: "zh-tw", // 設定使用繁體中文
+    langs: formatter.langsSettings(),
     columns: [
       { title: "編號", field: "no", width: 100 },
       {
@@ -99,7 +114,7 @@ onMounted(async () => {
         return ""; // 有資料時不顯示任何訊息
       }
     },
-    pagination: true,
+    // pagination: true,
     paginationSize: 10,
     paginationElement: pagerElm.value,
     paginationAddRow: "table",
@@ -120,6 +135,9 @@ onMounted(async () => {
   });
 });
 
+//清除查詢條件
+const clearCondition = () => {};
+
 //按下編輯按鈕
 const editBtn_clicked = (e) => {
   let action = e.target.id;
@@ -139,13 +157,18 @@ const editBtn_clicked = (e) => {
 
 <style scoped>
 .border {
+  display: flex;
+  flex-direction: column;
   border: 1px solid #ccc;
-  padding: 20px;
-  position: relative; /* 關鍵：設定相對定位 */
-  width: 100%;
-  height: 100px;
-  box-sizing: border-box; /* 確保 padding 和 border 不會影響寬度 */
+  position: relative;
+  padding-top: 25px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px; /* 底部padding加大，確保按鈕有足夠空間 */
   margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 10px; /* 項目間距 */
 }
 /* 外框標題 */
 .borderTitle {
@@ -164,6 +187,25 @@ input {
   font-size: 18px;
 }
 
+.filter-item {
+  display: flex; /* 在 filter-item 內使用 flexbox */
+  align-items: center; /* 垂直對齊 */
+}
+
+.filter-item label {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.filter-item input {
+  font-size: 18px;
+  flex: 1; /* 讓 input 填滿剩餘空間 */
+}
+
+.filter-item input[type="date"] {
+  width: 100px;
+}
+
 #topTools {
   display: flex;
   justify-content: space-between;
@@ -172,7 +214,18 @@ input {
   padding: 2px 2px 10px 2px; /* 容器內距 */
 }
 
-.button-container {
+/* 查詢動作按鈕容器 */
+.container-filter-btns {
+  display: flex;
+  flex-direction: row-reverse;
+  /* 按鈕間距 */
+  gap: 10px;
+  bottom: 10px;
+  right: 10px;
+}
+
+/* 編輯動作按鈕容器 */
+.container-action-btns {
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -180,8 +233,8 @@ input {
   padding: 2px 2px 10px 2px; /* 容器內距 */
 }
 
-.button-container button {
-  padding: 5px 20px;
+button {
+  padding: 5px 10px;
   border: none; /* 移除預設邊框 */
   border-radius: 5px;
   background-color: #4caf50; /* 設定背景顏色 */
@@ -189,17 +242,18 @@ input {
   cursor: pointer;
   transition: background-color 0.3s ease; /* 加入過渡效果 */
   font-size: 18px;
+  max-width: 150px;
 }
 /* 滑鼠懸停時改變背景顏色 */
-.button-container button:hover {
+button:hover {
   background-color: #45a049;
 }
 /* 只有在未 disabled 時才套用 hover 效果 */
-.button-container button:hover:not(:disabled) {
+button:hover:not(:disabled) {
   background-color: #45a049;
 }
 /* 無效按鈕 */
-.button-container button:disabled {
+button:disabled {
   background-color: #cccccc; /* disabled 時的背景顏色 (灰色) */
   color: #666666; /* disabled 時的文字顏色 (深灰色) */
   cursor: default; /* disabled 時的滑鼠游標 */
