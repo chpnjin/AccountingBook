@@ -218,7 +218,7 @@ const saveAccount = async () => {
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  width: 500px; /* 設定對話框寬度 */
+  width: 390px; /* 設定對話框寬度 */
 }
 
 .dialog-header {

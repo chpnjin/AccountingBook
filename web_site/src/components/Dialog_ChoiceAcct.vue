@@ -197,7 +197,7 @@ const choiceAcct = () => {
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  min-width: 500px;
+  min-width: 390px;
 }
 
 .dialog-header {
@@ -209,17 +209,13 @@ const choiceAcct = () => {
   padding-bottom: 10px;
 }
 
-.dialog-body {
-  position: relative; /* 相對定位母元素，給絕對定位的子元素提供參考 */
-}
-
 /* 整個主科目 */
 .dropdown {
   position: relative;
 }
 
 .dropdown-container {
-  display: flex;
+  /* display: flex; */
   align-items: center;
 }
 
@@ -242,7 +238,6 @@ const choiceAcct = () => {
   background: white; /* 設定背景顏色 */
   border: 1px solid #ccc; /* 邊框設定 */
   z-index: 10; /* 在其他元素之上顯示 */
-  margin-left: 55px;
   padding-left: 10px;
 }
 

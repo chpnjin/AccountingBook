@@ -239,13 +239,13 @@ const saveAccount = async () => {
   align-items: center;
   z-index: 1000;
 }
-
+/* 主視窗 */
 .dialog {
   background-color: white;
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  min-width: 500px;
+  min-width: 390px;
 }
 
 .dialog-header {
