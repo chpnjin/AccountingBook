@@ -9,8 +9,6 @@ import Report_IncomeStatement from '@/views/report-income-statement.vue';
 import Report_BalanceSheet from '@/views/report-balance-sheet.vue';
 import Setup_User from '@/views/setup-user.vue';
 import Setup_Accounts from '@/views/setup-accounts.vue';
-import { compile } from 'vue';
-import store from '../store'; // 使用 Vuex 管理狀態
 
 //定義路由
 //je = Journal Entry 縮寫，中文意思是 分錄 或 日記帳分錄

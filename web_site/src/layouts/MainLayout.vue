@@ -3,7 +3,8 @@
     <header class="header">
       <div>
         <img src="@/assets/menu.svg" class="icon-menu" @click="toggleSidebar" />
-        <router-link to="/" class="home-button">首頁</router-link>
+        <img src="@/assets/home.svg" class="icon-home" @click="$router.push('/')" />
+        <!-- <router-link to="/" class="home-button">首頁</router-link> -->
         <div class="user-info"></div>
       </div>
       <div class="user-info">
@@ -89,21 +90,14 @@ export default {
 
 .icon-menu {
   width: 30px;
-  background: #fff;
   margin-right: 10px;
   background-color: transparent;
 }
 
-.home-button {
-  background: #3498db; /* 或其他你喜歡的顏色 */
-  border: none;
-  color: #fff;
-  padding: 5px 10px;
-  cursor: pointer;
-  border-radius: 4px;
-  text-decoration: none; /* 移除連結底線 */
-  margin-right: 10px;
-  font-size: 18px;
+.icon-home{
+  position: relative;
+  top: 5px;
+  width: 40px;
 }
 
 .user-info {

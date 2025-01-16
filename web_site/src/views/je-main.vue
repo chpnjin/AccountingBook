@@ -4,14 +4,12 @@
     <span class="borderTitle">篩選</span>
     <div class="filter-item">
       <label>日期</label>
-      <input type="date" v-model="filterCondition.date_start" />～<input
-        type="date"
-        v-model="filterCondition.date_end"
-      />
+      <input type="date" v-model="filter.date_start" />
+      ～<input type="date" v-model="filter.date_end" />
     </div>
     <div class="filter-item">
       <label>摘要</label>
-      <input type="text" v-model="filterCondition.summary" />
+      <input type="text" v-model="filter.summary" />
     </div>
     <div class="filter-item">
       <!-- <label>包含科目 : </label> -->
@@ -44,6 +42,7 @@ import service from "@/services/voucherService"; //API呼叫服務
 import "tabulator-tables/dist/css/tabulator.min.css";
 import valList from "@/config/text-value.js";
 import formatter from "@/config/formatter.js";
+import { useFilterStore } from '@/stores/filter'; //保留查詢條件
 
 const router = useRouter();
 const dtObj = ref(Tabulator);
@@ -54,14 +53,13 @@ let dtData = reactive([]);
 let updateBtnDisable = ref(true);
 let loading = false;
 let selectedNo = ""; //被選中的傳票編號
-let filterCondition = reactive({
-  account_list: [],
-});
+const filter = useFilterStore(); //跨域容器:查詢條件保留
 
 //重抓交易紀錄
 const reload_je = async () => {
   loading = true;
-  let response = await service.getVoucherList(toRaw(filterCondition));
+  let params = { ...filter.$state };
+  let response = await service.getVoucherList(params);
   dtObj.value.setData(response);
   loading = false;
 };
@@ -72,8 +70,8 @@ const initFilterCondition = () => {
   let month = String(today.getMonth() + 1).padStart(2, "0");
   let day = String(today.getDate()).padStart(2, "0");
 
-  filterCondition.date_start = `${year}-${month}-01`; // 更簡潔的設定當月第一天
-  filterCondition.date_end = `${year}-${month}-${day}`;
+  filter.date_start = `${year}-${month}-01`; // 更簡潔的設定當月第一天
+  filter.date_end = `${year}-${month}-${day}`;
 };
 
 //初次讀取
@@ -136,7 +134,9 @@ onMounted(async () => {
 });
 
 //清除查詢條件
-const clearCondition = () => {};
+const clearCondition = () => {
+
+};
 
 //按下編輯按鈕
 const editBtn_clicked = (e) => {

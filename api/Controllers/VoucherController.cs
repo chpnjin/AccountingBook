@@ -69,20 +69,20 @@ namespace api.Controllers
                 string sql = @"SELECT no,entry_date,summary,handler,reviewer,status FROM voucher a ";
                 string conditions = "";
 
-                if (condition.date_start != null)
+                if (!condition.date_start.IsNullOrEmpty())
                 {
                     conditions += "WHERE entry_date >= @date_start ";
                     parms.Add("@date_start", condition.date_start);
                 }
 
-                if (condition.date_end != null)
+                if (!condition.date_end.IsNullOrEmpty())
                 {
                     conditions += condition.date_start.IsNullOrEmpty() ? "WHERE " : "AND ";
                     conditions += "entry_date <= @date_end ";
                     parms.Add("@date_end", condition.date_end);
                 }
 
-                if(condition.summary != null)
+                if(!condition.summary.IsNullOrEmpty())
                 {
                     conditions += condition.date_end.IsNullOrEmpty() ? "WHERE " : "AND ";
                     conditions += "summary LIKE @summary ";

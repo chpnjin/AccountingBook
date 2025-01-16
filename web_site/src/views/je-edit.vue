@@ -158,17 +158,6 @@ onMounted(async () => {
   }
 });
 
-//金額格式
-// const moneyFormatter = (cell) => {
-//   const value = cell.getValue();
-//   if (isNaN(value)) {
-//     return value;
-//   }
-//   return new Intl.NumberFormat("en-US", {
-//     minimumFractionDigits: 0,
-//     maximumFractionDigits: 2,
-//   }).format(value);
-// };
 //檢查填寫內容
 const checkForm = () => {
   //單頭欄位檢查
@@ -318,15 +307,12 @@ const cancel = () => {
 
 .summary {
   width: 100%; /* 摘要佔滿整列 */
-  padding: 5px;
-  margin-top: 10px;
   display: flex;
-  align-items: center;
+  flex-flow: column;
 }
 .summary label {
   width: 60px;
   margin-right: 5px;
-  text-align: right;
   font-size: 15px;
 }
 .summary input {
@@ -352,19 +338,51 @@ const cancel = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin: 5px 5px 5px 0px;
 }
+
 #topTools button {
-  font-size: medium;
+  font-size: 20px;
   margin-right: 5px;
 }
 
 .btnBar {
   display: flex;
-  justify-content: space-around;
-  padding: 5px;
+  justify-content:space-between;
+  align-items: center;
+  gap: 10px; /*按鈕間距*/
+  padding: 20px 2px 2px 2px; /* 容器內距 */
 }
+
 .btnBar button {
-  font-size: x-large;
-  width: 200px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* 加入過渡效果 */
+  font-size: 18px;
+  width: 100px;
 }
+
+button{
+  border: none; /* 移除預設邊框 */
+  border-radius: 5px;
+  background-color: #4caf50; /* 設定背景顏色 */
+  color: white; /* 設定文字顏色 */
+}
+
+/* 滑鼠懸停時改變背景顏色 */
+button:hover {
+  background-color: #45a049;
+}
+/* 只有在未 disabled 時才套用 hover 效果 */
+button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+/* 無效按鈕 */
+button:disabled {
+  background-color: #cccccc; /* disabled 時的背景顏色 (灰色) */
+  color: #666666; /* disabled 時的文字顏色 (深灰色) */
+  cursor: default; /* disabled 時的滑鼠游標 */
+  opacity: 0.6; /* 降低透明度，更明顯區分 */
+}
+
 </style>
