@@ -60,3 +60,5 @@
 /web_site/env/.env
 /web_site/env/.env.development
 /launchSettings.json
+api/Properties/launchSettings.json
+web_site/env/.env.development

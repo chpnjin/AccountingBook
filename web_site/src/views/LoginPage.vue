@@ -61,9 +61,9 @@ export default {
               localStorage.setItem("token", response.token);
               localStorage.setItem("id", response.id);
               localStorage.setItem("name", response.name);
-              // 導向主頁
-              this.message = "登入成功，準備導向主頁...";
-              this.$router.push("/");
+              //觸發登入成功事件
+              this.message = "登入成功，重新導向主頁...";
+              this.$emit('login_success');
             } else {
               this.message = response.msg;
             }
