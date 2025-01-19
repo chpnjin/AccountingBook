@@ -56,7 +56,7 @@ import accountService from "@/services/accountService"; //API呼叫服務
 import "tabulator-tables/dist/css/tabulator_simple.min.css"; // 引入 simple 主題
 import editDialog from "@/components/Dialog_Account.vue"; //引用彈出視窗組件
 import editSubDialog from "@/components/Dialog_SubAccount.vue"; //引用彈出視窗組件
-import accountTypes from "@/config/text-value.js";
+import options from "@/config/text-value.js";
 
 //引用物件
 const dialogTitle = ref(""); //彈窗標題
@@ -93,7 +93,7 @@ onMounted(async () => {
         width: 80,
         formatter: (cell) => {
           const value = cell.getValue();
-          const foundType = accountTypes.find((x) => x.value === value);
+          const foundType = options.find((x) => x.value === value);
           return foundType ? foundType.text : "未找到"; // 如果找不到則回傳 "未找到"
         },
       },
@@ -158,7 +158,7 @@ onMounted(async () => {
     if (row.isSelected()) {
       btnDisableSub.value = true;
       //科目類型中文名稱
-      typeName.value = accountTypes.find(
+      typeName.value = options.find(
         (x) => x.value === selectedMain.value.type
       ).text;
       //重讀子科目

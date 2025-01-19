@@ -40,9 +40,9 @@ import { TabulatorFull as Tabulator } from "tabulator-tables";
 import { useRouter } from "vue-router";
 import service from "@/services/voucherService"; //API呼叫服務
 import "tabulator-tables/dist/css/tabulator.min.css";
-import valList from "@/config/text-value.js";
+import options from "@/config/text-value.js";
 import formatter from "@/config/formatter.js";
-import { useFilterStore } from '@/stores/filter'; //保留查詢條件
+import { useFilterStore } from "@/stores/filter"; //保留查詢條件
 
 const router = useRouter();
 const dtObj = ref(Tabulator);
@@ -64,14 +64,19 @@ const reload_je = async () => {
   loading = false;
 };
 //初始化篩選條件
-const initFilterCondition = () => {
+const initFilterCondition = async () => {
   let today = new Date();
   let year = today.getFullYear();
   let month = String(today.getMonth() + 1).padStart(2, "0");
   let day = String(today.getDate()).padStart(2, "0");
 
-  filter.date_start = `${year}-${month}-01`; // 更簡潔的設定當月第一天
-  filter.date_end = `${year}-${month}-${day}`;
+  if (filter.date_start == "") {
+    filter.date_start = `${year}-${month}-01`; // 更簡潔的設定當月第一天
+  }
+
+  if (filter.date_end == "") {
+    filter.date_end = `${year}-${month}-${day}`;
+  }
 };
 
 //初次讀取
@@ -97,7 +102,7 @@ onMounted(async () => {
         width: 70,
         formatter: (cell) => {
           const value = cell.getValue();
-          const foundType = valList.find((x) => x.value === value);
+          const foundType = options.find((x) => x.value === value);
           return foundType ? foundType.text : "未知"; // 如果找不到則回傳 "未知"
         },
       },
@@ -128,14 +133,17 @@ onMounted(async () => {
   //初次載入時抓取資料
   await nextTick();
 
-  reload_je().then(() => {
-    initFilterCondition();
+  initFilterCondition().then(()=>{
+    reload_je();
   });
 });
 
 //清除查詢條件
 const clearCondition = () => {
-
+  filter.date_start = '';
+  filter.date_end = '';
+  filter.summary = '';
+  reload_je();
 };
 
 //按下編輯按鈕

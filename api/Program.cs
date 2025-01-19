@@ -54,7 +54,6 @@ try
     {
         // 使用環境變數獲取連接字符串
         var connectionString = Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING");
-        Console.Write(connectionString);
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new InvalidOperationException("SQL_CONNECTION_STRING environment variable is not set.");

@@ -55,12 +55,14 @@ let tbSettings = {
   layout: "fitColumns",
   height: "98%",
   columns: [
-    { title: "科目", field: "name",width:250 },
+    { title: "科目", field: "name", width: 255, resizable: false },
     {
       title: "餘額",
       field: "balance",
       formatter: formatters.moneyFormatter,
       hozAlign: "right",
+      resizable: false,
+      width: 100,
     },
   ],
 };

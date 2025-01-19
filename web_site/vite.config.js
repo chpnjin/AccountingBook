@@ -2,20 +2,21 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-export default defineConfig(() => { // defineConfig 接受函式
+export default defineConfig(() => {
+
   return {
-    base: "/", //指定部署後的基路徑
-    plugins: [ //插件
+    base: "/", // 指定部署後的基路徑
+    plugins: [ // 插件
       vue(),
       // vueDevTools(),
     ],
     resolve: {
       alias: {
-        //路徑簡寫
+        // 路徑簡寫
         '@': fileURLToPath(new URL('./src', import.meta.url))
       },
     },
-    //指定環境變數所在路徑
+    // 指定環境變數所在路徑
     envDir: fileURLToPath(new URL('./env', import.meta.url)),
   };
 });

@@ -1,6 +1,5 @@
 <!-- je/edit -->
 <template>
-  <h3>編輯傳票</h3>
   <div class="container">
     <div class="item">
       <label>編號</label> <input type="text" v-model="master.no" disabled />
@@ -29,6 +28,11 @@
     <p ref="pagerElm"></p>
   </div>
   <div ref="dtElm"></div>
+  <!-- 狀態與簽核者資訊 -->
+  <div class="statusBar">
+    <span>狀態:{{ options.find((x) => x.value == master.status).text }}</span>
+    <button @click="showSignedStatus">簽核狀態</button>
+  </div>
   <div class="btnBar">
     <button @click="save">儲存</button>
     <button @click="submit">送審</button>
@@ -50,12 +54,11 @@ import "tabulator-tables/dist/css/tabulator.min.css";
 import { useRouter } from "vue-router";
 import service from "@/services/voucherService"; //API
 import formatters from "@/config/formatter.js"; // 導入格式化函式陣列
+import options from "@/config/text-value";
 
 const router = new useRouter();
-const dtObj = ref(Tabulator);
 const dtElm = ref(null);
 const pagerElm = ref(null);
-const dtData = reactive([]);
 const selectAcctDialogVisible = ref(false);
 const dialogTitle = ref("");
 const vchrType = [
@@ -65,8 +68,12 @@ const vchrType = [
   { text: "轉帳", value: "transfer" },
 ];
 const noSelected = ref(true);
+const dtData = reactive([]);
+
 let loading = false;
 let selectedRow;
+let dtObj = null; //Tabulator 實例
+
 //單頭資料
 const master = reactive({
   no: "新增完成後自動編號",
@@ -81,10 +88,12 @@ const master = reactive({
 onMounted(async () => {
   await nextTick()
     .then(() => {
-      dtObj.value = new Tabulator(dtElm.value, {
+      dtObj = new Tabulator(dtElm.value, {
+        data: dtData,
         layout: "fitColumns",
-        height: "400px",
+        height: "340px",
         selectableRows: 1, //只允許單行選擇
+        movableRows: true,
         columns: [
           {
             title: "ID",
@@ -121,7 +130,6 @@ onMounted(async () => {
             hozAlign: "right",
           },
         ],
-        data: [], // 將假資料放入
         placeholder: () => {
           if (loading) {
             return "資料載入中..."; // 顯示載入中訊息
@@ -131,31 +139,39 @@ onMounted(async () => {
             return ""; // 有資料時不顯示任何訊息
           }
         },
-        // pagination: true,
-        paginationSize: 10,
-        paginationElement: pagerElm.value,
-        paginationAddRow: "table",
       });
     })
     .then(() => {
       //選中資料
-      dtObj.value.on("rowClick", (e, row) => {
+      dtObj.on("rowClick", (e, row) => {
         noSelected.value = row.isSelected() ? false : true;
-        if (row.isSelected()) {
-          selectedRow = row;
-        }
+        selectedRow = row.isSelected() ? row : null;
       });
-    });
-  // 網址帶參數時重抓資料
-  let voucherNo = router.currentRoute.value.query.no;
-  if (voucherNo) {
-    let result = await service.getVoucherDetail(voucherNo);
 
-    if (result) {
-      Object.assign(master, result.master);
-      dtObj.value.setData(result.detail);
-    }
-  }
+      //移動資料
+      dtObj.on("rowMoved", function () {
+        // 取得目前所有行
+        const rows = dtObj.getRows();
+        // 根據行順序更新原始資料
+        const updatedData = rows.map((r) => r.getData());
+        dtData.length = 0; // 清空原始資料
+        updatedData.forEach((item) => dtData.push(item)); // 更新 Vue 的反應式資料
+      });
+    })
+    .then(async () => {
+      // 網址帶參數時重抓資料
+      let voucherNo = router.currentRoute.value.query.no;
+
+      if (voucherNo) {
+        let result = await service.getVoucherDetail(voucherNo);
+
+        if (result) {
+          Object.assign(master, result.master);
+          Object.assign(dtData, result.detail);
+          dtObj.replaceData(dtData);
+        }
+      }
+    });
 });
 
 //檢查填寫內容
@@ -177,16 +193,16 @@ const checkForm = () => {
   }
 
   // 單身科目驗證
-  let data = dtObj.value.getData();
+  let data = dtObj.getData();
 
   // 取得底部計算的結果
-  let calcResults = dtObj.value.getCalcResults();
+  let calcResults = dtObj.getCalcResults();
 
   // 獲取借方與貸方總和
   let sumAmountD = calcResults.bottom["debit_amount"];
   let sumAmountC = calcResults.bottom["credit_amount"];
 
-  if(data.length < 2){
+  if (data.length < 2) {
     alert("科目至少要有兩個以上");
     return false;
   }
@@ -215,7 +231,7 @@ const dialogClosed = () => {
 //選定科目後按下確定
 const insertAcct = (acct) => {
   selectAcctDialogVisible.value = false;
-  dtObj.value.addRow({
+  dtObj.addRow({
     account_id: acct.id,
     account_no: acct.no,
     account_name: acct.name,
@@ -232,9 +248,9 @@ const deleteAccount = () => {
 //打包畫面資料
 const packData = () => {
   let data = {};
-  let items = dtObj.value.getData();
+  let items = dtObj.getData();
 
-  if(router.currentRoute.value.query.no == null){
+  if (router.currentRoute.value.query.no == null) {
     master.no = "";
   }
 
@@ -243,6 +259,9 @@ const packData = () => {
 
   return data;
 };
+
+//顯示簽核狀態
+const showSignedStatus = () => {};
 
 //儲存
 const save = async () => {
@@ -266,6 +285,7 @@ const submit = () => {
   if (checkForm() == false) {
     return;
   }
+  console.info(packData().detail);
 
   // router.push({ path: "/je" });
 };
@@ -285,7 +305,7 @@ const cancel = () => {
 
 .item {
   flex: 1; /* 項目平均分配空間 */
-  padding: 5px;
+  padding: 1px;
   display: flex; /* 讓 label 和 input 並排 */
   align-items: center; /* 垂直置中 */
 }
@@ -301,7 +321,7 @@ const cancel = () => {
   flex: 1;
 }
 
-.item input[type="date"]{
+.item input[type="date"] {
   width: 130px;
 }
 
@@ -348,10 +368,10 @@ const cancel = () => {
 
 .btnBar {
   display: flex;
-  justify-content:space-between;
+  justify-content: space-between;
   align-items: center;
   gap: 10px; /*按鈕間距*/
-  padding: 20px 2px 2px 2px; /* 容器內距 */
+  padding: 5px 2px 2px 2px; /* 容器內距 */
 }
 
 .btnBar button {
@@ -362,7 +382,18 @@ const cancel = () => {
   width: 100px;
 }
 
-button{
+.statusBar {
+  display: flex;
+  padding: 5px 2px 5px 2px; /* 容器內距 */
+  font-size: 20px;
+}
+
+.statusBar button {
+  margin-left: auto; /* 確保按鈕在右側 */
+  font-size: 20px;
+}
+
+button {
   border: none; /* 移除預設邊框 */
   border-radius: 5px;
   background-color: #4caf50; /* 設定背景顏色 */
@@ -384,5 +415,4 @@ button:disabled {
   cursor: default; /* disabled 時的滑鼠游標 */
   opacity: 0.6; /* 降低透明度，更明顯區分 */
 }
-
 </style>

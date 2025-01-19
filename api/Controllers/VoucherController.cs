@@ -136,7 +136,7 @@ namespace api.Controllers
             try
             {
                 masterSql = @"SELECT no,entry_date,voucher_type,summary,handler,reviewer,status FROM voucher WHERE no = @no";
-                detailSql = @"SELECT seq,account_id,
+                detailSql = @"SELECT account_id,
                                 b.no AS account_no,
                                 b.name AS account_name,
                                 summary,
