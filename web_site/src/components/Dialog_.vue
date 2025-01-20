@@ -25,13 +25,13 @@
 </template>
 
 <script setup>
-//定義父組件可訂閱事件
-const emit = defineEmits(["confirm", "close"]);
 //定義父組件可設定屬性
 const props = defineProps({
   visible: { type: Boolean, required: true }, // 控制顯示
   title: { type: String, default: "對話框" }, // 標題文字
 });
+//定義父組件可訂閱事件
+const emit = defineEmits(["confirm", "close"]);
 
 const closeDialog = () => {
   emit("close"); // 通知父層關閉對話框

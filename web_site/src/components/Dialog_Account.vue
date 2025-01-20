@@ -121,6 +121,30 @@ watch(
   { immediate: true }
 );
 
+watch(
+  () => account.no,
+  () => {
+    noError.value = false;
+    noErrorMessage.value = "";
+  }
+);
+
+watch(
+  () => account.name,
+  () => {
+    nameError.value = false;
+    nameErrorMessage.value = "";
+  }
+);
+
+watch(
+  () => account.description,
+  () => {
+    descriptionError.value = false;
+    descriptionErrorMessage.value = "";
+  }
+);
+
 const closeDialog = () => {
   resetAccount();
   emit("close");

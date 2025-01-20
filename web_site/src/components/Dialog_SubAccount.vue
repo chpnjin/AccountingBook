@@ -1,63 +1,51 @@
 <template>
-  <div v-if="visible" class="dialog-overlay">
-    <div class="dialog">
-      <div class="dialog-header">
-        <h2>{{ title }}</h2>
-        <!-- 右上關閉按鈕 -->
-        <button @click="closeDialog" class="close-button">&times;</button>
+  <DialogComponent
+    :visible="visible"
+    :title="title"
+    @close="closeDialog"
+    @confirm="saveAccount"
+  >
+    <template #default>
+      <input type="hidden" v-model="account.id" />
+      <div class="form-group">
+        <label>父科目名稱：</label>
+        <span>{{ parentAccount?.name }}</span>
       </div>
-      <div class="dialog-body">
-        <input type="hidden" v-model="account.id" />
-        <div class="form-group">
-          <label>父科目名稱：</label>
-          <span>{{ parentAccount?.name }}</span>
-        </div>
-        <div class="form-group">
-          <label>父科目類型：</label>
-          <span>{{ typeName }}</span>
-        </div>
-        <div class="form-group" :class="{ 'has-error': noError }">
-          <label for="subAccountNo">子科目編號：</label>
-          <input type="text" id="subAccountNo" v-model="account.no" />
-          <div v-if="noError" class="error-message">
-            {{ noErrorMessage }}
-          </div>
-        </div>
-        <div class="form-group" :class="{ 'has-error': nameError }">
-          <label for="subAccountName">子科目名稱：</label>
-          <input type="text" id="subAccountName" v-model="account.name" />
-          <div v-if="nameError" class="error-message">
-            {{ nameErrorMessage }}
-          </div>
-        </div>
-        <div class="form-group" :class="{ 'has-error': descriptionError }">
-          <label for="subAccountDescription">描述：</label>
-          <textarea
-            id="subAccountDescription"
-            v-model="account.description"
-          ></textarea>
-          <div v-if="descriptionError" class="error-message">
-            {{ descriptionErrorMessage }}
-          </div>
-        </div>
-        <div class="button-container">
-          <button @click="closeDialog">取消</button>
-          <button @click="saveAccount">確認</button>
+      <div class="form-group">
+        <label>父科目類型：</label>
+        <span>{{ typeName }}</span>
+      </div>
+      <div class="form-group" :class="{ 'has-error': noError }">
+        <label>子科目編號：</label>
+        <input type="text" v-model="account.no" />
+        <div v-if="noError" class="error-message">
+          {{ noErrorMessage }}
         </div>
       </div>
-    </div>
-  </div>
+      <div class="form-group" :class="{ 'has-error': nameError }">
+        <label for="subAccountName">子科目名稱：</label>
+        <input type="text" id="subAccountName" v-model="account.name" />
+        <div v-if="nameError" class="error-message">
+          {{ nameErrorMessage }}
+        </div>
+      </div>
+      <div class="form-group" :class="{ 'has-error': descriptionError }">
+        <label for="subAccountDescription">描述：</label>
+        <textarea
+          id="subAccountDescription"
+          v-model="account.description"
+        ></textarea>
+        <div v-if="descriptionError" class="error-message">
+          {{ descriptionErrorMessage }}
+        </div>
+      </div>
+    </template>
+  </DialogComponent>
 </template>
 
 <script setup>
-import {
-  ref,
-  reactive,
-  watch,
-  onMounted,
-  toRaw,
-} from "vue";
-
+import DialogComponent from "./Dialog_.vue";
+import { ref, reactive, watch, onMounted, toRaw } from "vue";
 import accountService from "@/services/accountService"; //API呼叫服務
 
 //定義可在父組件設定屬性
@@ -80,8 +68,8 @@ const props = defineProps({
   editingAccount: Object, //用於編輯既有科目
 });
 
-//定義事件
-const emit = defineEmits(["save", "close", "update:visible"]);
+const emit = defineEmits(["save", "close"]);
+
 //欄位驗證用
 const noError = ref(false);
 const nameError = ref(false);
@@ -191,6 +179,8 @@ const saveAccount = async () => {
     }
   }
 
+
+
   account.main_id = props.parentAccount.id;
   account.type = props.parentAccount.type;
 
@@ -200,35 +190,6 @@ const saveAccount = async () => {
 </script>
 
 <style scoped>
-.dialog-overlay {
-  position: fixed; /* 讓對話框固定在畫面中央 */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
-  display: flex;
-  justify-content: center; /* 水平置中 */
-  align-items: center; /* 垂直置中 */
-  z-index: 1000; /* 確保在最上層 */
-}
-/* 整體寬度 */
-.dialog {
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  width: 390px; /* 設定對話框寬度 */
-}
-
-.dialog-header {
-  display: flex;
-  justify-content: space-between; /* 標題與關閉按鈕分開 */
-  align-items: center;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 10px;
-}
-
 .form-group {
   margin-bottom: 10px;
 }
@@ -251,40 +212,6 @@ textarea {
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
-}
-
-button {
-  margin-top: 10px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  background-color: #42b983; /* Vue 的綠色 */
-  color: white;
-}
-
-button:hover {
-  background-color: #38a372;
-}
-
-.close-button {
-  font-size: 20px;
-  cursor: pointer;
-  border: none;
-}
-
-.button-container {
-  display: flex;
-  justify-content: flex-end; /* 靠右對齊 */
-  margin-top: 10px; /* 增加按鈕區塊與上方表單的間距 */
-}
-
-.button-container button {
-  margin-left: 10px; /* 按鈕間隔 */
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
 /* 錯誤訊息樣式 */

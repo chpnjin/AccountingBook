@@ -257,13 +257,11 @@ const handleDialogClose = () => {
   let selectedRows = obj_TMain.value.getSelectedRows();
   if (selectedRows.length > 0) {
     selectedMain.value = selectedRows[0].getData();
-    console.log(selectedMain.value);
   }
 
   selectedRows = obj_TSub.value.getSelectedRows();
   if (selectedRows.length > 0) {
     selectedSub.value = selectedRows[0].getData();
-    console.log(selectedSub.value);
   }
 
   mainDialogVisible.value = false;
