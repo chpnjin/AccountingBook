@@ -1,68 +1,53 @@
-<!-- 彈窗:編輯傳票選擇科目 -->
+<!-- 科目選擇 -->
 <template>
-  <div v-if="visible" class="dialog-overlay">
-    <div class="dialog">
-      <div class="dialog-header">
-        <h2>{{ title }}</h2>
-        <!-- click動作綁定Method : closeDialog -->
-        <button @click="closeDialog" class="close-button">&times;</button>
-      </div>
-      <div class="dialog-body">
-        <div class="dropdown">
-          <div class="dropdown-container">
-            <label>主科目</label>
-            <input
-              type="text"
-              v-model="selectedMainAcctName"
-              placeholder="請選擇..."
-              @focus="handleFocus"
-              @blur="handleBlur"
-              @input="filterOptions"
-              class="search-input"
-            />
-          </div>
-          <ul v-if="showMainList" class="options">
-            <!-- 只顯示過濾的項目 -->
-            <li
-              v-for="item in filteredAcctList"
-              :key="item.id"
-              @click="selectMain(item)"
-            >
-              {{ item.text }}
-            </li>
-          </ul>
+  <DialogComponent
+    :visible="dialogVisible"
+    title="選擇分錄科目"
+    @close="closeDialog"
+    @confirm="choiceAcct"
+  >
+    <template #default>
+      <div class="dropdown">
+        <div class="dropdown-container">
+          <label>主科目</label>
+          <input
+            type="text"
+            v-model="selectedMainAcctName"
+            placeholder="請選擇..."
+            @focus="handleFocus"
+            @blur="handleBlur"
+            @input="filterOptions"
+            class="search-input"
+          />
         </div>
-        <div>
-          <label>子科目</label>
-          <div ref="dtDialogElm"></div>
-        </div>
+        <ul v-if="showMainList" class="options">
+          <!-- 只顯示過濾的項目 -->
+          <li
+            v-for="item in filteredAcctList"
+            :key="item.id"
+            @click="selectMain(item)"
+          >
+            {{ item.text }}
+          </li>
+        </ul>
       </div>
-      <div class="button-container">
-        <button @click="choiceAcct" :disabled="choicedSubAcct">確認</button>
-        <button @click="closeDialog">取消</button>
+      <div>
+        <label>子科目</label>
+        <div ref="dtDialogElm"></div>
       </div>
-    </div>
-  </div>
+    </template>
+  </DialogComponent>
 </template>
-
 <script setup>
-import { ref, watch, nextTick} from "vue";
+import DialogComponent from "./Dialog_.vue";
+import { ref, watch, nextTick } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import "tabulator-tables/dist/css/tabulator.min.css";
 import service from "@/services/accountService"; //API
-
+//定義父組件可設定屬性
 const props = defineProps({
-  title: {
-    type: String,
-    default: "選擇分錄科目",
-  },
-  //視窗是否可見
-  visible: {
-    type: Boolean,
-    default: false,
-  },
+  dialogVisible: { type: Boolean, required: true }, // 控制顯示
 });
-
 //定義父組件可訂閱事件
 const emit = defineEmits(["selected", "close"]);
 const selectedMainAcctName = ref(""); //主科目查詢欄位文字
@@ -79,7 +64,7 @@ let loading = false;
 
 //視窗開啟時，重建子科目清單
 watch(
-  () => props.visible,
+  () => props.dialogVisible,
   async (isOpen) => {
     if (isOpen) {
       // 確保 DOM 已經渲染
@@ -111,7 +96,6 @@ watch(
           dtObj.value.on("rowClick", function (e, row) {
             if (row.isSelected()) {
               selectedSubAcct = row.getData();
-              console.info(selectedSubAcct);
             }
             choicedSubAcct.value = row.isSelected() ? false : true;
           });
@@ -179,43 +163,12 @@ const choiceAcct = () => {
 </script>
 
 <style scoped>
-.dialog-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.dialog {
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  min-width: 390px;
-}
-
-.dialog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-
 /* 整個主科目 */
 .dropdown {
   position: relative;
 }
 
 .dropdown-container {
-  /* display: flex; */
   align-items: center;
 }
 
@@ -256,49 +209,6 @@ li:hover {
 
 label {
   margin-right: 10px;
-}
-
-textarea {
-  width: 100%;
-  height: 100px;
-  resize: vertical;
-}
-
-.close-button {
-  font-size: 20px;
-  cursor: pointer;
-  border: none;
-}
-
-button {
-  margin-top: 10px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  background-color: #4caf50;
-  color: white;
-}
-
-button:hover {
-  background-color: #38a372;
-}
-
-.button-container {
-  display: flex;
-  flex-direction: row-reverse;
-  gap: 10px; /*按鈕間距*/
-}
-
-.button-container button {
-  padding: 5px 20px;
-  border: none; /* 移除預設邊框 */
-  border-radius: 5px;
-  background-color: #4caf50; /* 設定背景顏色 */
-  color: white; /* 設定文字顏色 */
-  cursor: pointer;
-  font-size: 15px;
-  transition: background-color 0.3s ease; /* 加入過渡效果 */
 }
 
 /* 表格外框 */

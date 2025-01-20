@@ -54,7 +54,7 @@ import { ref, onMounted, nextTick } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import accountService from "@/services/accountService"; //API呼叫服務
 import "tabulator-tables/dist/css/tabulator_simple.min.css"; // 引入 simple 主題
-import editDialog from "@/components/Dialog_Account.vue"; //引用彈出視窗組件
+import editDialog from "@/components/Dialog_Account.vue";
 import editSubDialog from "@/components/Dialog_SubAccount.vue"; //引用彈出視窗組件
 import options from "@/config/text-value.js";
 
@@ -187,15 +187,12 @@ const openDialog = (e) => {
   switch (dialog) {
     case "main-add":
       dialogTitle.value = "新增主科目";
-      // obj_TMain.value.deselectRow();
+
       selectedMain.value = [];
       mainDialogVisible.value = true;
       break;
     case "main-update":
       dialogTitle.value = "編輯主科目";
-      selectedMain.value = obj_TMain.value
-        .getSelectedRows()
-        .map((row) => row.getData())[0];
       mainDialogVisible.value = true;
       break;
     case "sub-add":

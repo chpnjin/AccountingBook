@@ -40,18 +40,23 @@
   </div>
   <editDialog
     :visible="selectAcctDialogVisible"
-    :title="dialogTitle"
+    :dialog-visible="selectAcctDialogVisible"
     @close="dialogClosed"
     @selected="insertAcct"
   ></editDialog>
+  <!-- 簽核彈窗 -->
+  <signDialog :visible="signDialogVisible" @close="dialogClosed"> </signDialog>
 </template>
 
 <script setup>
 import { ref, reactive, toRaw, onMounted, nextTick } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
-import editDialog from "@/components/Dialog_ChoiceAcct.vue"; //選擇科目彈窗
 import "tabulator-tables/dist/css/tabulator.min.css";
 import { useRouter } from "vue-router";
+
+import editDialog from "@/components/Dialog_ChoiceAcct.vue"; //選擇科目彈窗
+import signDialog from "@/components/Dialog_Sign.vue"; //簽核狀態彈窗
+
 import service from "@/services/voucherService"; //API
 import formatters from "@/config/formatter.js"; // 導入格式化函式陣列
 import options from "@/config/text-value";
@@ -60,6 +65,7 @@ const router = new useRouter();
 const dtElm = ref(null);
 const pagerElm = ref(null);
 const selectAcctDialogVisible = ref(false);
+const signDialogVisible = ref(false);
 const dialogTitle = ref("");
 const vchrType = [
   { text: "期初開帳", value: "opening" },
@@ -150,12 +156,12 @@ onMounted(async () => {
 
       //移動資料
       dtObj.on("rowMoved", function () {
-        // 取得目前所有行
+        // 取得目前畫面上的排列順序
         const rows = dtObj.getRows();
-        // 根據行順序更新原始資料
         const updatedData = rows.map((r) => r.getData());
-        dtData.length = 0; // 清空原始資料
-        updatedData.forEach((item) => dtData.push(item)); // 更新 Vue 的反應式資料
+        //更新原始資料
+        dtData.length = 0;
+        updatedData.forEach((item) => dtData.push(item));
       });
     })
     .then(async () => {
@@ -227,6 +233,7 @@ const addAccount = () => {
 //關閉彈窗事件
 const dialogClosed = () => {
   selectAcctDialogVisible.value = false;
+  signDialogVisible.value = false;
 };
 //選定科目後按下確定
 const insertAcct = (acct) => {
@@ -261,7 +268,9 @@ const packData = () => {
 };
 
 //顯示簽核狀態
-const showSignedStatus = () => {};
+const showSignedStatus = () => {
+  signDialogVisible.value = true;
+};
 
 //儲存
 const save = async () => {
