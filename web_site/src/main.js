@@ -4,8 +4,8 @@ import { createPinia } from 'pinia' //引用狀態管理
 
 import App from './App.vue'
 import router from './router' //引用路由
-import './assets/main.css'
-
+import '@/assets/main.css'
+import '@/assets/btn.css'
 
 const app = createApp(App);
 const pinia = createPinia();

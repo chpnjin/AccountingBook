@@ -10,14 +10,13 @@ export default {
       return `API 請求失敗，請確認API Server狀態(${error.message})`;
     }
   },
-
   //使用者認證
   async loginVerification(parm) {
     let response = await axios.post('User/LoginVerification', parm).then((axios) => {
       return {
         "token": axios.data.token,
-        "id" : axios.data.id,
-        "name" : axios.data.full_name
+        "id": axios.data.id,
+        "name": axios.data.full_name
       };
 
     }).catch((error) => {
@@ -26,11 +25,17 @@ export default {
 
     return response;
   },
-
+  //使用者是否存在?
+  async userExist(name, email) {
+    let response = await axios.get(`User/CheckUserExist?name=${name}&email=${email}`).then((result) => {
+      return result.data;
+    });
+    return response;
+  },
   //創建使用者
   async createUser(userData) {
     try {
-      const response = await axios.post('User/Insert', userData);
+      const response = await axios.post('User/EditUser', userData);
 
       return response.data;
     } catch (error) {

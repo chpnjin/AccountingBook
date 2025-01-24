@@ -40,4 +40,16 @@ namespace api.Models
         [Column("memory_size")]
         public int memory_size { get; set; }
     }
+
+    public class UserInsertInput
+    {
+        public int? id { get; set; }
+        public string name { get; set; }
+        public string email { get; set; }
+        public string role_group { get; set; }
+        public string full_name { get; set; }
+        public string department { get; set; }
+        public string job_title { get; set; }
+        public int phone { get; set; }
+    }
 }

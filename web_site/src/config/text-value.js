@@ -13,5 +13,9 @@ export default [
   { text: '開帳', value: "opening" },
   { text: '收入', value: "income" },
   { text: '支出', value: "expense" },
-  { text: '轉帳', value: "transfer" }
+  { text: '轉帳', value: "transfer" },
+  { type: 'authority', text: "系統管理員", value: "admin" },
+  { type: 'authority', text: "經辦", value: "operator" },
+  { type: 'authority', text: "複核", value: "reviewer" },
+  { type: 'authority', text: "核准", value: "approver" },
 ]

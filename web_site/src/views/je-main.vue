@@ -42,7 +42,7 @@ import service from "@/services/voucherService"; //API呼叫服務
 import "tabulator-tables/dist/css/tabulator.min.css";
 import options from "@/config/text-value.js";
 import formatter from "@/config/formatter.js";
-import { useFilterStore } from "@/stores/filter"; //保留查詢條件
+import { jeSearchCondition } from "@/stores/filter"; //保留查詢條件
 
 const router = useRouter();
 const dtObj = ref(Tabulator);
@@ -53,7 +53,7 @@ let dtData = reactive([]);
 let updateBtnDisable = ref(true);
 let loading = false;
 let selectedNo = ""; //被選中的傳票編號
-const filter = useFilterStore(); //跨域容器:查詢條件保留
+const filter = jeSearchCondition(); //跨域容器:查詢條件保留
 
 //重抓交易紀錄
 const reload_je = async () => {

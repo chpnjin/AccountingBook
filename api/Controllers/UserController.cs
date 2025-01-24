@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
+using System.Numerics;
 using System.Security.Claims;
 using System.Text;
 
@@ -15,11 +16,11 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IDbConnection _connection;
+        private readonly IDbConnection conn;
 
         public UserController(IDbConnection connection)
         {
-            _connection = connection;
+            conn = connection;
         }
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace api.Controllers
         /// <param name="Id"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static string GenerateToken(int Id,bool isAdmin)
+        public static string GenerateToken(int Id, bool isAdmin)
         {
             // 從環境變數中獲取配置
             var configuration = new ConfigurationBuilder()
@@ -106,7 +107,7 @@ namespace api.Controllers
                               INNER JOIN user_info t2 ON t1.id = t2.id
                               WHERE name = @parm_name OR email = @parm_email";
 
-                var user = await _connection.QuerySingleOrDefaultAsync<UserVerification>(sql, new
+                var user = await conn.QuerySingleOrDefaultAsync<UserVerification>(sql, new
                 {
                     parm_name = input.id,
                     parm_email = input.id,
@@ -144,6 +145,50 @@ namespace api.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("CheckUserExist")]
+        public async Task<ActionResult> CheckUserExist(string name,string email)
+        {
+            bool nameExist = false;
+            bool emailExist = false;
+
+            try
+            {
+                string sqlCheckName = @"SELECT COUNT(id) FROM user WHERE name = @name ";
+                string sqlCheckEmail = @"SELECT COUNT(id) FROM user WHERE email = @email ";
+
+                var countOfName = conn.QueryFirstOrDefault<int>(sqlCheckName, new { name });
+                var countOfEmail = conn.QueryFirstOrDefault<int>(sqlCheckEmail, new { email });
+
+                nameExist = countOfName > 0 ? true : false;
+                emailExist = countOfEmail > 0 ? true : false;
+
+                return Ok(new {
+                    name_exist = nameExist,
+                    email_exist = emailExist
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("Edit")]
+        public async Task<ActionResult> EditUser(UserInsertInput input)
+        {
+            string sql;
+            if (input.id.HasValue)
+            {
+                sql = "";
+            }
+            else
+            {
+                sql = "";
             }
         }
     }
