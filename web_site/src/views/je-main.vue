@@ -95,6 +95,14 @@ onMounted(async () => {
         field: "entry_date",
         width: 110,
       },
+      {
+        title: "總金額",
+        field: "amount",
+        width: 100,
+        bottomCalcFormatter: formatter.moneyFormatter, // 格式化為金額
+        formatter: formatter.moneyFormatter,
+        hozAlign: "right",
+      },
       { title: "摘要", field: "summary", width: 550 },
       {
         title: "狀態",
@@ -133,16 +141,16 @@ onMounted(async () => {
   //初次載入時抓取資料
   await nextTick();
 
-  initFilterCondition().then(()=>{
+  initFilterCondition().then(() => {
     reload_je();
   });
 });
 
 //清除查詢條件
 const clearCondition = () => {
-  filter.date_start = '';
-  filter.date_end = '';
-  filter.summary = '';
+  filter.date_start = "";
+  filter.date_end = "";
+  filter.summary = "";
   reload_je();
 };
 

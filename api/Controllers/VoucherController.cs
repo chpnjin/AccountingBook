@@ -59,6 +59,11 @@ namespace api.Controllers
             return newNo;
         }
 
+        /// <summary>
+        /// 傳票總攬
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <returns></returns>
         [HttpPost("List")]
         public async Task<ActionResult> List(SearchCondition condition)
         {
@@ -66,7 +71,7 @@ namespace api.Controllers
 
             try
             {
-                string sql = @"SELECT no,entry_date,summary,handler,reviewer,status FROM voucher a ";
+                string sql = @"SELECT a.no,entry_date,SUM(credit_amount) AS amount,a.summary,handler,reviewer FROM voucher a ";
                 string conditions = "";
 
                 if (!condition.date_start.IsNullOrEmpty())
@@ -85,7 +90,7 @@ namespace api.Controllers
                 if(!condition.summary.IsNullOrEmpty())
                 {
                     conditions += condition.date_end.IsNullOrEmpty() ? "WHERE " : "AND ";
-                    conditions += "summary LIKE @summary ";
+                    conditions += "a.summary LIKE @summary ";
                     parms.Add("@summary", "%" + condition.summary + "%");
                 }
 
@@ -96,14 +101,10 @@ namespace api.Controllers
                     parms.Add("@account_id", string.Join(",", condition.account_list));
                 }
 
+                sql += "INNER JOIN voucher_detail b ON a.no = b.no ";
                 sql += conditions;
 
-                if(condition.account_list.Where(x => x > 0).Any())
-                {
-                    conditions += "INNER JOIN voucher_detail b ON a.no = b.no ";
-                }
-
-                sql += "ORDER BY create_time DESC";
+                sql += "GROUP BY b.no ";
 
                 var data = await conn.QueryAsync<Voucher>(sql, parms);
 

@@ -21,6 +21,8 @@ namespace api.Models
 
         public string? summary { get; set; }
 
+        public decimal amount { get; set; }
+
         public int handler { get; set; }
 
         public int? reviewer { get; set; }
