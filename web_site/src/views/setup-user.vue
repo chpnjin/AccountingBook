@@ -17,23 +17,21 @@
       </div>
     </div>
     <div class="multiSelectDropdown">
-        <label>權限群組</label><MultiSelectDropdown />
-      </div>
+      <label>權限群組</label><MultiSelectDropdown />
+    </div>
     <div class="container-filter-btns">
       <button @click="search">查詢</button>
       <button @click="clearCondition">清除條件</button>
     </div>
   </div>
   <div class="button-container">
-    <button id="add" @click="openDialog">
-      新增
-    </button>
+    <button id="add" @click="openDialog">新增</button>
     <button id="update" @click="openDialog" :disabled="disableEdit">
       編輯
     </button>
     <button @click="inActiveSub" :disabled="canInactive">停用</button>
   </div>
-  <div ref="elmDt"></div>
+  <div ref="dtElm"></div>
   <dialogEdit
     :visible="editDialogVisible"
     :title="dialogTitle"
@@ -51,8 +49,8 @@ import formatter from "@/config/formatter.js";
 import { jeSearchCondition } from "@/stores/filter"; //保留查詢條件
 import dialogEdit from "@/components/Dialog_User.vue";
 
-const elmDt = ref(null);
-let objDt = null; //主科目物件
+const dtElm = ref(null);
+let dtObj = null; //主科目物件
 const editDialogVisible = ref(false);
 const canInactive = ref(false);
 const dialogTitle = ref("");
@@ -62,7 +60,7 @@ const dtData = reactive([]);
 const editData = reactive([]);
 
 onMounted(async () => {
-  objDt = new Tabulator(elmDt.value, {
+  dtObj = new Tabulator(dtElm.value, {
     layout: "fitColumns",
     height: "420px",
     selectableRows: 1, //只允許單行選擇
@@ -76,12 +74,16 @@ onMounted(async () => {
       { title: "所屬權限群組", field: "group", width: 250 },
       { title: "狀態", field: "status", width: 70 },
     ],
-  })
+  });
 });
 
-nextTick().then(()=>{
-
-})
+nextTick().then(() => {
+  //選中資料
+  dtObj.on("rowClick", (e, row) => {
+    noSelected.value = row.isSelected() ? false : true;
+    selectedRow = row.isSelected() ? row : null;
+  });
+});
 
 const openDialog = (e) => {
   if (e.target.id == "add") {

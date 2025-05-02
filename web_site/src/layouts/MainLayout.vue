@@ -69,8 +69,6 @@ export default {
 .main-layout {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  width: 100vw;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -124,7 +122,6 @@ button {
   display: flex;
   flex: 1;
   overflow: hidden;
-  width: 100%;
 }
 
 .sidebar {
@@ -148,11 +145,11 @@ button {
 }
 
 .content {
-  flex: 1;
-  background: #ecf0f1;
-  box-sizing: border-box;
-  overflow-y: auto;
-  padding: 10px;
-  height: 100%;
+	flex: 1;
+	background: #ecf0f1;
+	box-sizing: border-box;
+	overflow-y: auto;
+	padding: 10px;
+	height: calc(100vh - 60px); /*扣除頂端列高度*/
 }
 </style>

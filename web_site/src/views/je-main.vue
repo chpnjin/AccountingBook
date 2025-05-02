@@ -61,6 +61,7 @@ const reload_je = async () => {
   let params = { ...filter.$state };
   let response = await service.getVoucherList(params);
   dtObj.value.setData(response);
+  dtObj.value.setSort([{ column: "entry_date", dir: "desc" }]);
   loading = false;
 };
 //初始化篩選條件

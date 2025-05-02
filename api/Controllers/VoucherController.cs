@@ -71,7 +71,7 @@ namespace api.Controllers
 
             try
             {
-                string sql = @"SELECT a.no,entry_date,SUM(credit_amount) AS amount,a.summary,handler,reviewer FROM voucher a ";
+                string sql = @"SELECT a.no,entry_date,SUM(credit_amount) AS amount,a.summary,handler,reviewer,status FROM voucher a ";
                 string conditions = "";
 
                 if (!condition.date_start.IsNullOrEmpty())
