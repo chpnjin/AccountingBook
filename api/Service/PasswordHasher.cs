@@ -1,4 +1,5 @@
-﻿using Konscious.Security.Cryptography;
+﻿using api.Models;
+using Konscious.Security.Cryptography;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -24,7 +25,7 @@ namespace api.Service
         /// </summary>
         /// <param name="password">未加密明碼</param>
         /// <returns></returns>
-        public static async Task<(byte[] hash, byte[] salt, int degreeOfParallelism, int iterations, int memorySize)> HashPassword(string password)
+        public static async Task<UserVerification> HashPassword(string password)
         {
             byte[] salt = GenerateRandomSalt(16);
             using var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
@@ -35,8 +36,16 @@ namespace api.Service
                 MemorySize = 65536
             };
 
+            UserVerification userVerification = new UserVerification();
+
             var hash = await argon2.GetBytesAsync(16);
-            return (hash, salt, argon2.DegreeOfParallelism, argon2.Iterations, argon2.MemorySize);
+            userVerification.password_hash = hash;
+            userVerification.salt = salt;
+            userVerification.degree_of_parallelism = argon2.DegreeOfParallelism;
+            userVerification.iterations = argon2.Iterations;
+            userVerification.memory_size = argon2.MemorySize;
+
+            return userVerification;
         }
 
         /// <summary>

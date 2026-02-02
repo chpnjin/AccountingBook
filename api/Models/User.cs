@@ -41,7 +41,10 @@ namespace api.Models
         public int memory_size { get; set; }
     }
 
-    public class UserInsertInput
+    /// <summary>
+    /// 輸入編輯使用者
+    /// </summary>
+    public class UserEditInput
     {
         public int? id { get; set; }
         public string name { get; set; }

@@ -38,6 +38,7 @@
     <button @click="submit">送審</button>
     <button @click="cancel">取消</button>
   </div>
+  <!-- 新增科目彈窗 -->
   <editDialog
     :visible="selectAcctDialogVisible"
     :dialog-visible="selectAcctDialogVisible"
@@ -45,7 +46,11 @@
     @selected="insertAcct"
   ></editDialog>
   <!-- 簽核彈窗 -->
-  <signDialog :visible="signDialogVisible" @close="dialogClosed"> </signDialog>
+  <signDialog
+    :visible="signDialogVisible"
+    :dialog-visible="signDialogVisible"
+    @close="dialogClosed"
+  ></signDialog>
 </template>
 
 <script setup>
@@ -60,6 +65,7 @@ import signDialog from "@/components/Dialog_Sign.vue"; //簽核狀態彈窗
 import service from "@/services/voucherService"; //API
 import formatters from "@/config/formatter.js"; // 導入格式化函式陣列
 import options from "@/config/text-value";
+import { jeCopyData } from "@/stores/filter"; //複製傳票資料
 
 const router = new useRouter();
 const dtElm = ref(null);
@@ -75,6 +81,7 @@ const vchrType = [
 ];
 const noSelected = ref(true);
 const dtData = reactive([]);
+const copyData = jeCopyData(); //跨域容器:傳票複製
 
 let loading = false;
 let selectedRow;
@@ -147,6 +154,7 @@ onMounted(async () => {
         },
       });
     })
+    //註冊表格事件
     .then(() => {
       //選中資料
       dtObj.on("rowClick", (e, row) => {
@@ -164,8 +172,8 @@ onMounted(async () => {
         updatedData.forEach((item) => dtData.push(item));
       });
     })
+    //網址帶參數時重抓資料
     .then(async () => {
-      // 網址帶參數時重抓資料
       let voucherNo = router.currentRoute.value.query.no;
 
       if (voucherNo) {
@@ -178,6 +186,15 @@ onMounted(async () => {
         }
       }
     });
+
+  //傳票複製功能:當Table渲染完成後,檢查Copy容器是否有資料
+  dtObj.on("tableBuilt", () => {
+    if (copyData.voucher_type != "") {
+      master.voucher_type = copyData.voucher_type;
+      master.summary = copyData.main_summary;
+      dtObj.replaceData(copyData.account_list);
+    }
+  });
 });
 
 //檢查填寫內容

@@ -68,5 +68,21 @@ export default {
       console.info(error);
       return error;
     }
+  },
+  //停用|啟用科目
+  async setActive(account) {
+    let response;
+    let parms = {
+        id: account.id,
+        active: account.active == 1 ? 0 : 1
+    };
+
+    try {
+      response = await axios.post("Account/SetEnable", parms);
+      return response.data;
+    } catch (e) {
+      console.info(e);
+      return e;
+    }
   }
 };

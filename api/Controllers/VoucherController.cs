@@ -236,5 +236,48 @@ namespace api.Controllers
                 }
             }
         }
+
+        /// <summary>
+        /// 複製傳票摘要與所有科目做為新增時基礎資料,節省新增科目作業
+        /// </summary>
+        /// <param name="voucherNo">傳票編號</param>
+        /// <returns></returns>
+        [HttpGet("Copy")]
+        public async Task<ActionResult> Copy(string voucherNo)
+        {
+            VoucherInput result = new VoucherInput();
+            string masterSql, detailSql;
+
+            try
+            {
+                masterSql = @"SELECT voucher_type,summary FROM voucher WHERE no = @voucherNo";
+                detailSql = @"SELECT account_id,
+                                b.no AS account_no,
+                                b.name AS account_name,
+                                summary 
+                                FROM voucher_detail a
+                                LEFT JOIN account b ON a.account_id = b.id
+                                WHERE a.no = @voucherNo
+                                ORDER BY seq";
+
+                var master = conn.Query<Voucher>(masterSql, new { voucherNo }).FirstOrDefault();
+                var detail = conn.Query<VoucherDetail>(detailSql, new { voucherNo }).ToList();
+
+                if (master != null)
+                {
+                    result.master = master;
+                }
+                if (detail != null)
+                {
+                    result.detail = detail;
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

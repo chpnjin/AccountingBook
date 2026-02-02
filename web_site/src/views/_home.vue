@@ -33,11 +33,11 @@ import formatters from "@/config/formatter.js"; // 導入格式化函式陣列
 import options from "@/config/text-value";
 
 //綁定元素
-const elmAsset = ref(null);
-const elmLiability = ref(null);
-const elmRevenue = ref(null);
-const elmExpense = ref(null);
-const elmEquity = ref(null);
+const elmAsset = ref(Tabulator);
+const elmLiability = ref(Tabulator);
+const elmRevenue = ref(Tabulator);
+const elmExpense = ref(Tabulator);
+const elmEquity = ref(Tabulator);
 
 //Tabulator物件
 let dtAsset = reactive({});
@@ -82,6 +82,13 @@ nextTick().then(async () => {
   dtRevenue.setData(await service.getAccountBalance("Revenue"));
   dtExpense.setData(await service.getAccountBalance("Expense"));
   dtEquity.setData(await service.getAccountBalance("Equity"));
+
+  //設定以科目名稱排序
+  dtAsset.setSort([{ column: "name", dir: "asc" }]);
+  dtLiability.setSort([{ column: "name", dir: "asc" }]);
+  dtRevenue.setSort([{ column: "name", dir: "asc" }]);
+  dtExpense.setSort([{ column: "name", dir: "asc" }]);
+  dtEquity.setSort([{ column: "name", dir: "asc" }]);
 });
 </script>
 

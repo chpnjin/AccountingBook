@@ -16,7 +16,16 @@ export const userSearchCondition = defineStore('filter', {
   state: () => ({
     name: '',
     email: '',
-    tel:'',
-    
+    tel: '',
+
   }),
+});
+
+//傳票結構複製資料容器
+export const jeCopyData = defineStore('jeData', {
+  state: () => ({
+    main_summary: '',
+    voucher_type:'',
+    account_list: []
+  })
 });

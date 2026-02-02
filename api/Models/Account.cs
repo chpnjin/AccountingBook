@@ -15,10 +15,16 @@
     }
 
     /// <summary>
-    /// 查詢子科目膗入參數
+    /// 查詢子科目帶入參數
     /// </summary>
     public class GetSubAccountInput
     {
         public int main_id { get; set; }
+    }
+
+    public class Parms_SetAccountActive
+    {
+        public int id { get; set; }
+        public int active { get; set; }
     }
 }

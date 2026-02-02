@@ -25,6 +25,9 @@
       <button id="edit" :disabled="updateBtnDisable" @click="editBtn_clicked">
         修改
       </button>
+      <button id="copy" :disabled="updateBtnDisable" @click="editBtn_clicked">
+        複製
+      </button>
       <button id="void" :disabled="updateBtnDisable" @click="editBtn_clicked">
         作廢
       </button>
@@ -35,14 +38,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, toRaw, onMounted, nextTick } from "vue";
+import { ref, reactive, onMounted, nextTick } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import { useRouter } from "vue-router";
 import service from "@/services/voucherService"; //API呼叫服務
 import "tabulator-tables/dist/css/tabulator.min.css";
 import options from "@/config/text-value.js";
 import formatter from "@/config/formatter.js";
-import { jeSearchCondition } from "@/stores/filter"; //保留查詢條件
+import { jeSearchCondition, jeCopyData } from "@/stores/filter"; //保留查詢條件
 
 const router = useRouter();
 const dtObj = ref(Tabulator);
@@ -54,6 +57,7 @@ let updateBtnDisable = ref(true);
 let loading = false;
 let selectedNo = ""; //被選中的傳票編號
 const filter = jeSearchCondition(); //跨域容器:查詢條件保留
+const copyData = jeCopyData(); //跨域容器:傳票複製
 
 //重抓交易紀錄
 const reload_je = async () => {
@@ -155,17 +159,36 @@ const clearCondition = () => {
   reload_je();
 };
 
-//按下編輯按鈕
-const editBtn_clicked = (e) => {
+// 按下編輯按鈕
+const editBtn_clicked = async (e) => {
   let action = e.target.id;
 
+  copyData.main_summary = "";
+  copyData.voucher_type = "";
+  copyData.account_list = [];
+
   switch (action) {
-    case "add":
+    case "add": //新增
       router.push({ path: "je/edit" });
       break;
-    case "edit":
+    case "edit": //編輯
       router.push({ path: "je/edit", query: { no: selectedNo.no } });
       break;
+    case "copy": { //傳票複製
+      let result = await service.copy(selectedNo.no);
+      //將API查詢結果傳入容器
+      if (result != null) {
+        copyData.main_summary = result.master.summary;
+        copyData.voucher_type = result.master.voucher_type;
+
+        copyData.account_list = [];
+        result.detail.forEach(item => {
+          copyData.account_list.push(item);
+        });
+      }
+      router.push({ path: "je/edit" });
+      break;
+    }
     case "void":
       break;
   }

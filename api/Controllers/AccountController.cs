@@ -146,5 +146,31 @@ namespace api.Controllers
                 }
             }
         }
+
+        /// <summary>
+        /// 設定啟用／停用
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="active"></param>
+        /// <returns></returns>
+        [HttpPost("SetEnable")]
+        public async Task<ActionResult> SetEnable([FromBody] Parms_SetAccountActive parms)
+        {
+            try
+            {
+                string sqlStr = "UPDATE account SET active = @active WHERE id = @id ";
+                await conn.ExecuteAsync(sqlStr, new
+                {
+                    parms.active,
+                    parms.id
+                });
+
+                return Ok("Done");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

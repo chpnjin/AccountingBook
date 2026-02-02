@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using api.Models;
+using Dapper;
 using MySqlConnector;
 using System.Collections.Generic;
 using System.Data;
@@ -42,7 +43,7 @@ namespace api.Service
                 VALUES (@name, @email, @role_group, @password_hash, @salt, @degree_of_parallelism, @iterations, @memory_size);
                 SELECT CAST(LAST_INSERT_ID() AS INT);";
 
-                        var hashedPassword = await PasswordHasher.HashPassword("111111");
+                        UserVerification hashedPassword = await PasswordHasher.HashPassword("111111");
 
                         // 插入到 user 表，並獲取自動生成的 ID
                         var userId = await connection.ExecuteScalarAsync<int>(userSql, new
@@ -50,11 +51,11 @@ namespace api.Service
                             name = "admin",
                             email = "admin@example.com",
                             role_group = "admin",
-                            password_hash = hashedPassword.hash,
-                            salt = hashedPassword.salt,
-                            degree_of_parallelism = hashedPassword.degreeOfParallelism,
-                            iterations = hashedPassword.iterations,
-                            memory_size = hashedPassword.memorySize
+                            hashedPassword.password_hash,
+                            hashedPassword.salt,
+                            hashedPassword.degree_of_parallelism,
+                            hashedPassword.iterations,
+                            hashedPassword.memory_size
                         }, transaction);
 
                         // 插入到 user_info 表

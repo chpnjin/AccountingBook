@@ -4,10 +4,14 @@ using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using MySqlConnector;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mail;
+using System.Net;
 using System.Numerics;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace api.Controllers
@@ -16,11 +20,12 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IDbConnection conn;
+        private readonly MySqlConnection conn;
 
         public UserController(IDbConnection connection)
         {
-            conn = connection;
+            conn = (MySqlConnection)connection;
+            conn.Open();
         }
 
         /// <summary>
@@ -83,6 +88,60 @@ namespace api.Controllers
             var stringToken = tokenHandler.WriteToken(token);
 
             return stringToken;
+        }
+
+        /// <summary>
+        /// 生成隨機密碼
+        /// </summary>
+        /// <param name="length">字元長度</param>
+        /// <returns></returns>
+        public static string GenerateSecurePassword(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+=-";
+
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                var bytes = new byte[length];
+                rng.GetBytes(bytes);
+                var result = new char[length];
+
+                for (int i = 0; i < length; i++)
+                {
+                    result[i] = chars[bytes[i] % chars.Length];
+                }
+
+                return new string(result);
+            }
+        }
+
+        /// <summary>
+        /// 送出E-mail
+        /// </summary>
+        /// <returns></returns>
+        public static bool SendActionEmail(string to,string from,string name, string password)
+        {
+            var message = new MailMessage();
+            message.To.Add(to);
+            message.Subject = "帳號啟用通知";
+            message.Body = "初始化密碼";
+            message.From = new MailAddress(from);
+            message.IsBodyHtml = true; // 設定郵件內容為 HTML 格式
+
+            var smtpClient = new SmtpClient("smtp.gmail.com"); // 使用 Gmail 的 SMTP 伺服器
+            smtpClient.Port = 587; // Gmail 的 SMTP 埠號
+            smtpClient.Credentials = new NetworkCredential(from, password);
+            smtpClient.EnableSsl = true;
+
+            try
+            {
+                smtpClient.Send(message);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("郵件寄送失敗：" + ex.Message);
+                return false;
+            }
         }
 
         /// <summary>
@@ -150,7 +209,7 @@ namespace api.Controllers
 
         [Authorize]
         [HttpGet("CheckUserExist")]
-        public async Task<ActionResult> CheckUserExist(string name,string email)
+        public async Task<ActionResult> CheckUserExist(string name, string email)
         {
             bool nameExist = false;
             bool emailExist = false;
@@ -166,7 +225,8 @@ namespace api.Controllers
                 nameExist = countOfName > 0 ? true : false;
                 emailExist = countOfEmail > 0 ? true : false;
 
-                return Ok(new {
+                return Ok(new
+                {
                     name_exist = nameExist,
                     email_exist = emailExist
                 });
@@ -177,18 +237,114 @@ namespace api.Controllers
             }
         }
 
+        /// <summary>
+        /// 編輯使用者
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPost("Edit")]
-        public async Task<ActionResult> EditUser(UserInsertInput input)
+        public async Task<ActionResult> EditUser(UserEditInput input)
         {
-            string sql;
+            string sql, sql_detail, rendomPassword;
+            UserVerification hashedPassword = new UserVerification();
+
+
             if (input.id.HasValue)
             {
-                sql = "";
+                sql = @"UPDATE user SET 
+                            name = @name,
+                            email = @email,
+                            role_group = @role_group
+                        WHERE id = @id ";
+
+                sql_detail = @"UPDATE user_info SET 
+                                full_name = @full_name, 
+                                    phone = @phone 
+                        WHERE id = @id ";
             }
             else
             {
-                sql = "";
+                sql = @"INSERT INTO user 
+                        (name, email, password_hash, salt, degree_of_parallelism, iterations, memory_size, role_group,status) 
+                        VALUES 
+                        (@name, @email, @password_hash, @salt, @degree_of_parallelism, @iterations, @memory_size, @role_group,@status);
+                        SELECT CAST(LAST_INSERT_ID() AS INT);
+                        ";
+
+                sql_detail = @"INSERT INTO user_info 
+                               (id, full_name, department, job_title, phone)
+                               VALUES 
+                              (@id, @full_name, @department, @job_title, @phone)";
+
+                //新增時隨機生成密碼
+                rendomPassword = GenerateSecurePassword(10);
+                hashedPassword = await PasswordHasher.HashPassword(rendomPassword);
+            }
+
+            using (var transaction = await conn.BeginTransactionAsync())
+            {
+                try
+                {
+                    if (input.id.HasValue)
+                    {
+                        await conn.ExecuteScalarAsync<int>(sql, new
+                        {
+                            input.id.Value,
+                            input.name,
+                            input.email,
+                            input.role_group,
+                            @status = "Inactive" //預設未啟用
+                        }, transaction);
+
+                        await conn.ExecuteScalarAsync<int>(sql_detail, new
+                        {
+                            input.id.Value,
+                            input.full_name,
+                            input.department,
+                            input.job_title,
+                            input.phone,
+                        });
+
+                    }
+                    else //新增人員
+                    {
+                        var userId = await conn.ExecuteScalarAsync<int>(sql, new
+                        {
+                            input.name,
+                            input.email,
+                            input.role_group,
+                            hashedPassword.password_hash,
+                            hashedPassword.salt,
+                            hashedPassword.degree_of_parallelism,
+                            hashedPassword.iterations,
+                            hashedPassword.memory_size
+                        }, transaction);
+
+                        await conn.ExecuteScalarAsync<int>(sql_detail, new
+                        {
+                            @id = userId,
+                            input.full_name,
+                            input.department,
+                            input.job_title,
+                            input.phone,
+                        }, transaction);
+
+                        //寄送密碼至E-mail
+                        if (input.id.HasValue == false)
+                        {
+
+                        }
+                    }
+
+                    await transaction.CommitAsync();
+                    return Ok("done");
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    return BadRequest(ex.Message);
+                }
             }
         }
     }

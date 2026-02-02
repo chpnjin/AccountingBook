@@ -1,6 +1,6 @@
 import axios from "./_axios";
 //模擬讀取等待
-const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+// const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 
 export default {
   //取得傳票清單
@@ -39,5 +39,15 @@ export default {
     result = await axios.post("Voucher/Edit", data);
 
     return result.data;
+  }, //複製傳票結構
+  async copy(no){
+    let result = await axios.get(`Voucher/Copy?voucherNo=${no}`);
+
+    if (result.data.master && result.data.detail) {
+      return result.data;
+    }else{
+      console.error(result.statusText);
+      return null;
+    }
   }
 }

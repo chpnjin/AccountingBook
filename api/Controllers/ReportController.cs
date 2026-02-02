@@ -41,7 +41,7 @@ namespace api.Controllers
                 {
                     sqlStr = @"SELECT b.name,SUM(a.debit_amount) - SUM(a.credit_amount) AS balance
                                   FROM voucher_detail a
-                                  INNER JOIN account b ON a.account_id = b.id
+                                  INNER JOIN account b ON a.account_id = b.id AND b.active = 1
                                   WHERE b.type = @type
                                   GROUP BY a.account_id
                                   ;";
@@ -51,7 +51,7 @@ namespace api.Controllers
                 {
                     sqlStr = @"SELECT b.name,SUM(a.credit_amount) - SUM(a.debit_amount) AS balance
                                   FROM voucher_detail a
-                                  INNER JOIN account b ON a.account_id = b.id
+                                  INNER JOIN account b ON a.account_id = b.id AND b.active = 1
                                   WHERE b.type = @type
                                   GROUP BY a.account_id
                                   ;";
