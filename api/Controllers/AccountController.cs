@@ -122,7 +122,6 @@ namespace api.Controllers
                                    type = @type,
                                 main_id = @main_id,
                             description = @description,
-                                 active = TRUE,
                       last_updated_time = CURRENT_TIMESTAMP() 
                                WHERE id = @id";
                     }
@@ -137,7 +136,11 @@ namespace api.Controllers
                     }
 
                     await tran.CommitAsync();
-                    return Ok("Done");
+
+                    var updatedAccount = await conn.QueryFirstOrDefaultAsync<Account>(
+                        "SELECT * FROM account WHERE id = @id", new { parms.id });
+
+                    return Ok(updatedAccount);
                 }
                 catch (Exception ex)
                 {
@@ -165,7 +168,10 @@ namespace api.Controllers
                     parms.id
                 });
 
-                return Ok("Done");
+                var updatedAccount = await conn.QueryFirstOrDefaultAsync<Account>(
+                "SELECT * FROM account WHERE id = @id", new { parms.id });
+
+                return Ok(updatedAccount);
             }
             catch (Exception ex)
             {

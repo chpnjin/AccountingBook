@@ -82,7 +82,7 @@ const account = reactive({
   id: null,
   no: "",
   name: "",
-  description: "",
+  description: ""
 }); //紀錄子科目輸入值
 
 const resetAccount = () => {
@@ -91,7 +91,7 @@ const resetAccount = () => {
     id: null,
     no: "",
     name: "",
-    description: "",
+    description: ""
   });
   resetErrorMessages();
 };
