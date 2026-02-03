@@ -4,10 +4,14 @@ export default {
   //API呼叫測試
   async getServerInfo() {
     try {
-      const response = await axios.get('Test/GetServerInfo');
-      return response.status === 200 ? response.data : `API 請求失敗，狀態碼: ${response.status} ${response.statusText}`;
+      let response = await axios.get('Test/GetServerInfo');
+      if(response.status == 200){
+        return `正常`
+      }else{
+        return `API 請求失敗，狀態碼: ${response.status} ${response.statusText}`;
+      }
     } catch (error) {
-      return `API 請求失敗，請確認API Server狀態(${error.message})`;
+      return `API 請求失敗，請確認API Server狀態(${error.response.data})`;
     }
   },
   //使用者認證

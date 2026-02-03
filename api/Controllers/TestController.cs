@@ -56,17 +56,16 @@ namespace api.Controllers
         [Route("GetServerInfo")]
         public async Task<ActionResult<string>> NoNeedAuthorizeTest()
         {
-
             try
             {
-                string sql = @"SELECT 'TEST OK'FROM user ";
+                string sql = @"SELECT 'TEST OK' ";
 
                 _connection.Open();
                 var test = await _connection.QuerySingleOrDefaultAsync<string>(sql);
                 var builder = new MySqlConnectionStringBuilder(_connection.ConnectionString);
                 string server = builder.Server;
 
-                return Ok(builder.Server);
+                return Ok("Done");
             }
             catch (Exception ex)
             {

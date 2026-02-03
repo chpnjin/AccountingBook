@@ -14,7 +14,7 @@
   <div class="system-info">
     <span>建置日期：{{ buildDate }}</span>
     <span>API路徑：{{ apiUrl }}</span>
-    <span>連線資料庫：{{ dbTarget }}</span>
+    <span>資料庫狀態：{{ dbStatus }}</span>
   </div>
 </template>
 
@@ -29,11 +29,11 @@ export default {
       message: "",
       buildDate: import.meta.env.VITE_BUILD_DATE || "建置日期未設定", // 提供預設值
       apiUrl: import.meta.env.VITE_API_URL || "未設定", //
-      dbTarget: "取得中...",
+      dbStatus: "取得中...",
     };
   },
   async mounted() {
-    this.dbTarget = await this.GetDbInfo();
+    this.dbStatus = await this.GetDbInfo();
   },
   methods: {
     async btnLogin_click() {
@@ -78,6 +78,7 @@ export default {
     //單元測試按鈕
     async test() {
       console.log(import.meta.env);
+
     },
     GetDbInfo() {
       return UserService.getServerInfo();

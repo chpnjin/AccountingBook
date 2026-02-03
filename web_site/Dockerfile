@@ -11,9 +11,6 @@ RUN npm install
 
 COPY . .
 
-# 寫入建置時間到 .env 檔案
-RUN echo "VITE_BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')" >> .env
-
 # 確保 dist 目錄存在
 RUN mkdir -p dist
 RUN npm run build
