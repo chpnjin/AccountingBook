@@ -178,5 +178,26 @@ namespace api.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// 取得所有權益類科目
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetEquityTypeAccounts")]
+        public async Task<ActionResult> GetAllEquityAccount()
+        {
+            try
+            {
+                string sqlStr = "SELECT id,no,name FROM `account` WHERE TYPE = 'Equity' AND main_id IS NOT NULL";
+
+                var accountList = await conn.QueryAsync(sqlStr);
+
+                return Ok(accountList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

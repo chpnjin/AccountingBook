@@ -32,7 +32,7 @@ export default {
     let response;
 
     try {
-      response = await axios.get(`Account/CheckAccountExist?accountNo=${accountNo}`).then((result)=>{
+      response = await axios.get(`Account/CheckAccountExist?accountNo=${accountNo}`).then((result) => {
         return result.data;
       });
 
@@ -73,12 +73,23 @@ export default {
   async setActive(account) {
     let response;
     let parms = {
-        id: account.id,
-        active: account.active == 1 ? 0 : 1
+      id: account.id,
+      active: account.active == 1 ? 0 : 1
     };
 
     try {
       response = await axios.post("Account/SetEnable", parms);
+      return response.data;
+    } catch (e) {
+      console.info(e);
+      return e;
+    }
+  },
+  //取得所有權益類科目
+  async getEquityTypeAccounts() {
+    let response;
+    try {
+      response = await axios.get(`Account/GetEquityTypeAccounts`)
       return response.data;
     } catch (e) {
       console.info(e);

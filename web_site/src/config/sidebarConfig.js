@@ -4,6 +4,7 @@ export default [
     title: '傳票作業',
     submenu: [
       { name: 'je-edit', label: '編輯' },
+      { name: 'je-closing', label: '結帳' },
       { name: 'je-approval', label: '審核' },
     ],
   },

@@ -1,5 +1,5 @@
 <template>
-  <DialogComponent
+  <Dialog
     :visible="visible"
     :title="title"
     @close="closeDialog"
@@ -84,10 +84,10 @@
         </div>
       </div>
     </template>
-  </DialogComponent>
+  </Dialog>
 </template>
 <script setup>
-import DialogComponent from "./Dialog_.vue";
+import Dialog from "./Dialog_.vue";
 import { ref, reactive, watch, onMounted, toRaw } from "vue";
 import MultiSelectDropdown from "@/components/_MultiSelectDropdown.vue";
 import service from "@/services/userService.js";

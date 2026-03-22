@@ -1,10 +1,8 @@
-DROP TABLE IF EXISTS voucher;
-DROP TABLE IF EXISTS voucher_detail;
 -- 傳票單頭
 CREATE TABLE voucher(
     no VARCHAR(20) NOT NULL UNIQUE COMMENT '傳票編號',
     entry_date DATE NOT NULL COMMENT '交易日期',
-    voucher_type ENUM('opening', 'income', 'expense', 'transfer') NOT NULL COMMENT '傳票類型',
+    voucher_type ENUM('opening', 'income', 'expense', 'transfer','closing') NOT NULL COMMENT '傳票類型',
     summary TEXT COMMENT '傳票摘要',
     handler INT NOT NULL COMMENT '經辦人員ID(user.id)',
     reviewer INT COMMENT '複核人員ID(user.id)',
@@ -24,5 +22,11 @@ CREATE TABLE voucher_detail(
     summary TEXT COMMENT '項目摘要',
     debit_amount DECIMAL(18,2) DEFAULT 0.00 COMMENT '借方金額',
     credit_amount DECIMAL(18,2) DEFAULT 0.00 COMMENT '貸方金額',
-    UNIQUE (no, seq)
+    UNIQUE (no, seq),
+    CHECK (debit_amount = 0 OR credit_amount = 0)
 );
+
+-- 建立年份索引
+ALTER TABLE voucher 
+ADD COLUMN entry_year INT AS (YEAR(entry_date)) VIRTUAL,
+ADD INDEX (entry_year);

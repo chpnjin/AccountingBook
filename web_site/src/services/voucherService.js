@@ -40,14 +40,43 @@ export default {
 
     return result.data;
   }, //複製傳票結構
-  async copy(no){
+  async copy(no) {
     let result = await axios.get(`Voucher/Copy?voucherNo=${no}`);
 
     if (result.data.master && result.data.detail) {
       return result.data;
-    }else{
+    } else {
       console.error(result.statusText);
       return null;
+    }
+  }, //取得可結帳年份
+  async getCanClosingYears() {
+    let result = await axios.get(`Voucher/GetCanClosingYears`);
+
+    if (result.data) {
+      return result.data;
+    } else {
+      console.error(result.statusText);
+      return null;
+    }
+  }, //取得指定年份虛帳戶結算結果
+  async getGetNominalAccountBalances(year) {
+    let response = await axios.get(`Voucher/GetNominalAccountBalances?year=${year}`);
+
+    return response.data;
+  }, //生成結帳傳票
+  async generateClosingVoucher(year,accoundId) {
+    const response = await axios.post('Voucher/Closing', null, {
+      params: {
+        year: year,
+        equityAccountId: accoundId // 傳送隱藏的 ID
+      }
+    });
+
+    if (response.status === 200) {
+      return "done"
+    } else {
+      return "false"
     }
   }
 }

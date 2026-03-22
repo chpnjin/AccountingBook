@@ -97,14 +97,50 @@ try
     {
         app.UseSwagger();
         app.UseSwaggerUI();
+        //建立一個生成測試用Token的Route
+        app.MapGet("/generate-test-token", () =>
+        {
+            var jwtKey = builder.Configuration["Jwt:Key"];
+            var issuer = builder.Configuration["Jwt:Issuer"];
+            var audience = builder.Configuration["Jwt:Audience"];
+
+            if (string.IsNullOrEmpty(jwtKey)) return Results.BadRequest("Secret Key 未設定");
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            // 設定 Claim (可根據你的登入邏輯增加，例如 Role)
+            var claims = new[]
+            {
+            new System.Security.Claims.Claim("sub", "test-user-id"),
+            new System.Security.Claims.Claim("name", "DeveloperTest"),
+            new System.Security.Claims.Claim("role", "Admin")
+        };
+
+            var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.Now.AddYears(10), // 設為 10 年效期
+                signingCredentials: credentials);
+
+            var tokenString = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(token);
+
+            return Results.Ok(new
+            {
+                Message = "這是開發環境專用的長效 Token (10年)",
+                Token = tokenString
+            });
+        });
     }
 
     var settings = builder.Configuration["ALLOWED_ORIGINS"];
     var allowedOrigins = new List<string>();
 
+    //允許本機測試環境訪問API
     if (settings == null)
     {
-        allowedOrigins.AddRange(["http://localhost:5173", "http://chpngen920.synology.me:5005"]);
+        allowedOrigins.AddRange(["http://localhost:4173", "http://chpngen920.synology.me:5005"]);
     }
     else
     {
@@ -118,6 +154,8 @@ try
     .AllowCredentials()); // 如果需要傳送 cookie 或認證信息
 
     app.UseRouting();
+    //允許本機測試環境訪問API
+    app.UseCors("AllowAll");
 
     // 添加用於認證和授權的中間件
     app.UseAuthentication();

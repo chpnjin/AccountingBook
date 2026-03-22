@@ -4,6 +4,7 @@ import Main from '@/layouts/MainLayout.vue';
 import Login from '@/views/LoginPage.vue';
 import JE from '@/views/je-main.vue';
 import JE_Edit from '@/views/je-edit.vue';
+import JE_Closing from '@/views/je-closing.vue';
 import JE_Approval from '@/views/je-approval.vue';
 import Report_IncomeStatement from '@/views/report-income-statement.vue';
 import Report_BalanceSheet from '@/views/report-balance-sheet.vue';
@@ -22,6 +23,7 @@ const routes = [
       { path: 'je', name: 'je', component: JE },
       { path: 'je/edit', name: 'je-edit', component: JE_Edit },
       { path: 'je/approval', name: 'je-approval', component: JE_Approval },
+      { path: 'je/closing', name: 'je-closing', component: JE_Closing },
       { path: 'report/income-statement', name: 'report-income-statement', component: Report_IncomeStatement },
       { path: 'report/balance-sheet', name: 'report-balance-sheet', component: Report_BalanceSheet },
       { path: 'setup/user', name: 'setup-user', component: Setup_User },

@@ -1,5 +1,5 @@
 <template>
-  <DialogComponent
+  <Dialog
     :visible="visible"
     :title="title"
     @close="closeDialog"
@@ -40,11 +40,11 @@
         </div>
       </div>
     </template>
-  </DialogComponent>
+  </Dialog>
 </template>
 
 <script setup>
-import DialogComponent from "./Dialog_.vue";
+import Dialog from "./Dialog_.vue";
 import { ref, reactive, watch, onMounted, toRaw } from "vue";
 import accountService from "@/services/accountService"; //API呼叫服務
 

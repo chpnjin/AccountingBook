@@ -1,6 +1,6 @@
 <!-- 科目選擇 -->
 <template>
-  <DialogComponent
+  <Dialog
     :visible="dialogVisible"
     title="選擇分錄科目"
     @close="closeDialog"
@@ -36,10 +36,10 @@
         <div ref="dtDialogElm"></div>
       </div>
     </template>
-  </DialogComponent>
+  </Dialog>
 </template>
 <script setup>
-import DialogComponent from "./Dialog_.vue";
+import Dialog from "./Dialog_.vue";
 import { ref, watch, nextTick } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import "tabulator-tables/dist/css/tabulator.min.css";
