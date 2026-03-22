@@ -33,7 +33,7 @@ namespace api.Controllers
         /// <returns></returns>
         string GenerateNewVoucherNo(MySqlTransaction transaction)
         {
-            string getLastOneNo = @"SELECT no FROM voucher ORDER BY create_time DESC LIMIT 1";
+            string getLastOneNo = @"SELECT no FROM voucher WHERE `no` NOT LIKE 'CLOSING_%' ORDER BY create_time DESC LIMIT 1";
             string? lastOneNo = conn.QuerySingleOrDefault<string>(getLastOneNo, null, transaction);
             DateTime now = DateTime.Now;
             string newNo = "";
