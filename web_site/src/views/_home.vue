@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import { useRouter } from "vue-router";
 import "tabulator-tables/dist/css/tabulator_simple.min.css"; // 引入tabulator主題
