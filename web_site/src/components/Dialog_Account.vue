@@ -1,10 +1,5 @@
 <template>
-  <Dialog
-    :visible="visible"
-    :title="title"
-    @close="closeDialog"
-    @confirm="saveAccount"
-  >
+  <Dialog :visible="visible" :title="title" @close="closeDialog" @confirm="saveAccount">
     <template #default>
       <input type="hidden" v-model="account.id" />
       <div class="form-group" :class="{ 'has-error': noError }">
@@ -20,11 +15,7 @@
       <div class="form-group">
         <label for="select-option">科目類別：</label>
         <select id="select-option" v-model="account.type">
-          <option
-            v-for="option in typeList"
-            :key="option.value"
-            :value="option.value"
-          >
+          <option v-for="option in typeList" :key="option.value" :value="option.value">
             {{ option.title }}
           </option>
         </select>
@@ -183,6 +174,7 @@ const saveAccount = async () => {
 .form-group {
   margin-bottom: 10px;
 }
+
 label {
   display: block;
   margin-bottom: 5px;

@@ -35,6 +35,7 @@ export default {
   async mounted() {
     this.dbStatus = await this.GetDbInfo();
   },
+  emits: ['login_success'],
   methods: {
     async btnLogin_click() {
       try {

@@ -547,5 +547,43 @@ INSERT INTO voucher_detail (
                 });
             }
         }
+
+        /// <summary>
+        /// 取得特定科目交易明細
+        /// </summary>
+        /// <param name="AcctName">科目名稱</param>
+        /// <returns></returns>
+        [HttpGet("GetAcctTranDetailsOfThisYear")]
+        public async Task<ActionResult> GetAcctTranDetailsOfThisYear([FromQuery] string acctName)
+        {
+            try
+            {
+                string sql = @$"SELECT 
+                                    DATE_FORMAT(a.entry_date, '%Y-%m-%d') AS entry_date,
+                                    b.summary,
+                                    b.debit_amount,
+                                    b.credit_amount,
+                                    b.`no`
+                                FROM voucher a
+                                INNER JOIN voucher_detail b ON a.`no` = b.`no`
+                                INNER JOIN `account` c ON b.account_id = c.id
+                                WHERE c.`name` = '{acctName}'
+                                ORDER BY entry_date DESC";
+
+                var data = conn.Query(sql);
+
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "發生錯誤",
+                    Detail = ex.Message,
+                    Instance = HttpContext.Request.Path
+                });
+            }
+        }
     }
 }

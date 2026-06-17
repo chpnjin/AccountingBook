@@ -78,5 +78,11 @@ export default {
     } else {
       return "false"
     }
+  },
+  //取得特定科目所在傳票名細
+  async getAcctTranDetails(acctName) {
+    let response = await axios.get(`Voucher/GetAcctTranDetailsOfThisYear?acctName=${acctName}`);
+
+    return response.data;
   }
 }

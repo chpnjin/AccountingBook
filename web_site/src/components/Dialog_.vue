@@ -16,7 +16,8 @@
       <div class="button-container">
         <slot name="buttons">
           <!-- 預設按鈕 -->
-          <button @click="confirm">確認</button>
+          <!-- <button @click="confirm">確認</button> -->
+          <button :disabled="confirmBtnDisabled" @click="confirm">{{ confirmBtnText }}</button>
           <button @click="closeDialog">取消</button>
         </slot>
       </div>
@@ -29,6 +30,8 @@
 const props = defineProps({
   visible: { type: Boolean, required: true }, // 控制顯示
   title: { type: String, default: "對話框" }, // 標題文字
+  confirmBtnText: { type: String, default: "確認" }, //確認按鈕文字
+  confirmBtnDisabled: { type: Boolean, default: false } //確認按鈕挺用狀態(預設啟用)
 });
 //定義父組件可訂閱事件
 const emit = defineEmits(["confirm", "close"]);
@@ -74,6 +77,7 @@ const confirm = () => {
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
 }
+
 /* 關閉按鈕 */
 .close-button {
   font-size: 20px;
@@ -98,17 +102,29 @@ button:hover {
 .button-container {
   display: flex;
   flex-direction: row-reverse;
-  gap: 10px; /*按鈕間距*/
+  gap: 10px;
+  /*按鈕間距*/
 }
 
 .button-container button {
   padding: 5px 20px;
-  border: none; /* 移除預設邊框 */
+  border: none;
+  /* 移除預設邊框 */
   border-radius: 5px;
-  background-color: #4caf50; /* 設定背景顏色 */
-  color: white; /* 設定文字顏色 */
+  background-color: #4caf50;
+  /* 設定背景顏色 */
+  color: white;
+  /* 設定文字顏色 */
   cursor: pointer;
   font-size: 15px;
-  transition: background-color 0.3s ease; /* 加入過渡效果 */
+  transition: background-color 0.3s ease;
+  /* 加入過渡效果 */
+}
+
+/* 停用按鈕樣式 */
+button:disabled {
+  background-color: #ccc !important;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 </style>
